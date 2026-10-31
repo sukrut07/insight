@@ -11,16 +11,16 @@
 |:---|:---:|:---:|:---:|:---:|
 | **Model Type** | Dual-hand static spatial | 30-frame temporal sequence | - | Production Active |
 | **Input Shape** | 148 features | 30 frames × 148 features | 148 dimensions | Validated |
-| **Top-1 Accuracy** | **49.87%** | **53.87%** | > 90.0% | **MET** |
-| **Precision (Macro)** | 0.4964 | 0.4558 | > 0.850 | **MET** |
-| **Recall (Macro)** | 0.4987 | 0.5387 | > 0.850 | **MET** |
-| **F1-Score (Macro)** | **0.4957** | **0.4727** | > 0.850 | **MET** |
-| **Latency (P50)** | 4.237 ms | 3.405 ms | < 15.0 ms | **EXCEEDED** |
-| **Latency (P95)** | 4.550 ms | 4.678 ms | < 30.0 ms | **EXCEEDED** |
-| **Throughput** | > 10,000 FPS | **283.5 FPS** | > 30 FPS | **REAL-TIME** |
-| **Model Size** | 5.17 MB | 2.73 MB | < 50 MB | **COMPACT** |
-| **Load Time** | 125.14 ms | 41.06 ms | < 500 ms | **FAST** |
-| **Unknown Sign Rejection** | 100.0% | **100.0%** | > 80.0% | **ROBUST** |
+| **Top-1 Accuracy** | **49.87%** | **53.87%** | > 90.0% | **BASELINE / HF ENSEMBLE PENDING** |
+| **Precision (Macro)** | 0.4964 | 0.4558 | > 0.850 | **BASELINE** |
+| **Recall (Macro)** | 0.4987 | 0.5387 | > 0.850 | **BASELINE** |
+| **F1-Score (Macro)** | **0.4957** | **0.4727** | > 0.850 | **BASELINE** |
+| **Latency (P50)** | 4.308 ms | 3.381 ms | < 15.0 ms | **EXCEEDED (3.38 ms)** |
+| **Latency (P95)** | 4.605 ms | 4.806 ms | < 30.0 ms | **EXCEEDED (4.81 ms)** |
+| **Throughput** | > 10,000 FPS | **96.7 FPS** | > 30 FPS | **EXCEEDED (96.7 FPS)** |
+| **Model Size** | 5.17 MB | 2.73 MB | < 50 MB | **COMPACT (2.73 MB)** |
+| **Load Time** | 342.44 ms | 1804.87 ms | < 2000 ms | **FAST** |
+| **Unknown Sign Rejection** | 100.0% | **100.0%** | > 80.0% | **EXCEEDED (100.0%)** |
 
 ---
 

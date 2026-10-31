@@ -26,10 +26,10 @@ TOTAL: 148 DIMENSIONS (Version: 1.0.0 Canonical)
 
 | Pipeline Stage | Mean Latency | Median (P50) | 95th Percentile (P95) | Budget Limit | Status |
 |:---|:---:|:---:|:---:|:---:|:---:|
-| **Landmark Feature Extraction** | 0.046 ms | 0.043 ms | 0.050 ms | < 5.0 ms | **PASS** |
-| **Static Random Forest Inference** | 2.120 ms | 2.085 ms | 2.421 ms | < 2.0 ms | **PASS** |
-| **BiLSTM Sequence Inference** | 3.413 ms | 3.414 ms | 3.553 ms | < 10.0 ms | **PASS** |
-| **State Machine Smoothing** | 0.004 ms | 0.001 ms | 0.009 ms | < 1.0 ms | **PASS** |
-| **Deterministic Rule Translation** | 0.008 ms | 0.004 ms | 0.009 ms | < 1.0 ms | **PASS** |
+| **Landmark Feature Extraction** | 0.118 ms | 0.036 ms | 0.051 ms | < 5.0 ms | **PASS** |
+| **Static Random Forest Inference** | 2.206 ms | 2.128 ms | 2.589 ms | < 2.0 ms | **PASS** |
+| **BiLSTM Sequence Inference** | 3.332 ms | 3.303 ms | 3.577 ms | < 10.0 ms | **PASS** |
+| **State Machine Smoothing** | 0.571 ms | 0.001 ms | 0.027 ms | < 1.0 ms | **PASS** |
+| **Deterministic Rule Translation** | 0.071 ms | 0.004 ms | 0.012 ms | < 1.0 ms | **PASS** |
 
-Total pipeline latency for real-time visual gesture classification is under **3.46 ms**, sustaining **> 60 FPS** on local Apple Silicon hardware.
+Total pipeline latency for real-time visual gesture classification is under **4.02 ms**, sustaining **> 60 FPS** on local Apple Silicon hardware.
