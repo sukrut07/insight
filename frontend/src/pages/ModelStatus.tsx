@@ -353,7 +353,7 @@ export const ModelStatus: React.FC = () => {
 
               <div>
                 <span
-                  className={`text-xs font-black px-3 py-1 rounded-full border-2 ${
+                  className={`text-xs font-black px-3 py-1 rounded-full border-2 whitespace-nowrap inline-flex items-center justify-center ${
                     m.status
                       ? 'bg-[#CDEFD4] text-emerald-800 border-[#242424]'
                       : 'bg-[#F8CFD0] text-rose-800 border-[#242424]'

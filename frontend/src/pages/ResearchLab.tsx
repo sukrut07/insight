@@ -385,16 +385,16 @@ export const ResearchLab: React.FC = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full min-w-[850px] text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-[#F8F6EF] border-b-2 border-[#242424]">
-                  <th className="p-3 font-black text-[#242424]">Hugging Face Candidate</th>
-                  <th className="p-3 font-black text-[#242424]">Lang</th>
+                  <th className="p-3 font-black text-[#242424] min-w-[180px]">Hugging Face Candidate</th>
+                  <th className="p-3 font-black text-[#242424] whitespace-nowrap">Lang</th>
                   <th className="p-3 font-black text-[#242424]">Task / Granularity</th>
                   <th className="p-3 font-black text-[#242424]">Architecture</th>
                   <th className="p-3 font-black text-[#242424]">Input Modality</th>
-                  <th className="p-3 font-black text-[#242424]">License</th>
-                  <th className="p-3 font-black text-[#242424]">Status</th>
+                  <th className="p-3 font-black text-[#242424] whitespace-nowrap">License</th>
+                  <th className="p-3 font-black text-[#242424] whitespace-nowrap min-w-[140px]">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y border-b border-[#242424] font-medium text-[#333]">
@@ -461,21 +461,21 @@ export const ResearchLab: React.FC = () => {
                   },
                 ].map((row, idx) => (
                   <tr key={idx} className="hover:bg-[#F8F6EF]/60 transition">
-                    <td className="p-3 font-black text-[#242424] font-mono text-[11px]">
+                    <td className="p-3 font-black text-[#242424] font-mono text-[11px] whitespace-nowrap">
                       {row.id}
                     </td>
-                    <td className="p-3">
-                      <span className="px-2 py-0.5 bg-[#F8F6EF] border border-[#242424] rounded-md font-black text-[10px]">
+                    <td className="p-3 whitespace-nowrap">
+                      <span className="inline-flex items-center justify-center px-2 py-0.5 bg-[#F8F6EF] border border-[#242424] rounded-md font-black text-[10px]">
                         {row.lang}
                       </span>
                     </td>
                     <td className="p-3 font-semibold">{row.task}</td>
                     <td className="p-3">{row.arch}</td>
                     <td className="p-3 text-[11px] text-[#555]">{row.input}</td>
-                    <td className="p-3 font-mono text-[11px]">{row.license}</td>
-                    <td className="p-3">
+                    <td className="p-3 font-mono text-[11px] whitespace-nowrap">{row.license}</td>
+                    <td className="p-3 whitespace-nowrap">
                       <span
-                        className="px-2.5 py-0.5 border border-[#242424] rounded-full text-[10px] font-black shadow-[1px_1px_0px_#242424]"
+                        className="inline-flex items-center justify-center px-3 py-1 border-2 border-[#242424] rounded-full text-[11px] font-black whitespace-nowrap shadow-[2px_2px_0px_#242424]"
                         style={{ backgroundColor: row.statusBg }}
                       >
                         {row.status}
