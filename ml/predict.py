@@ -88,7 +88,10 @@ class GesturePredictor:
         # Add to rolling buffer
         engineered_148, metadata = self.feature_buffer.add_frame(detected_hands)
 
-        # Obtain temporal and static candidates
+        # Obtain candidates from kinematic anatomical analysis and learned classifiers
+        from ml.kinematics import classify_isl_kinematics
+        k_label, k_conf = classify_isl_kinematics(detected_hands)
+
         label = "UNKNOWN"
         confidence = 0.0
 
@@ -102,8 +105,16 @@ class GesturePredictor:
         # Fallback to static model if temporal confidence is low
         if label == "UNKNOWN" and self.static_clf is not None:
             pred_id, conf = self.static_clf.predict(engineered_148)
-            if conf >= self.confidence_threshold:
-                label = self.id_to_label.get(pred_id, "UNKNOWN")
+            static_lbl = self.id_to_label.get(pred_id, "UNKNOWN")
+            # If static model and kinematic analysis agree, boost confidence
+            if static_lbl == k_label and k_label not in ("NONE", "UNKNOWN"):
+                label = k_label
+                confidence = max(conf, k_conf, 0.88)
+            elif k_conf >= 0.80 and k_label not in ("NONE", "UNKNOWN"):
+                label = k_label
+                confidence = k_conf
+            elif conf >= self.confidence_threshold:
+                label = static_lbl
                 confidence = conf
             elif metadata["left_detected"] and not metadata["right_detected"]:
                 # Signer adaptation: mirror single left hand to right hand to test single-handed signs
@@ -123,6 +134,9 @@ class GesturePredictor:
                 if m_conf >= self.confidence_threshold and m_conf > conf:
                     label = self.id_to_label.get(m_pred_id, "UNKNOWN")
                     confidence = m_conf
+        elif label == "UNKNOWN" and k_conf >= 0.75 and k_label not in ("NONE", "UNKNOWN"):
+            label = k_label
+            confidence = k_conf
 
         self.prediction_history.append((label, confidence))
 
