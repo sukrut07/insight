@@ -122,3 +122,24 @@ async def test_live_ollama_e2b_fallback_inference():
     assert resp.provider == ProviderType.OLLAMA_E2B.value
     assert resp.parsed_json is not None
     assert "sentence" in resp.parsed_json
+
+
+@pytest.mark.asyncio
+async def test_live_gemini_api_inference():
+    """Live inference test on Google Gemini cloud API when key is configured."""
+    if not await model_orchestrator.gemini.is_available():
+        pytest.skip("Gemini API key is not configured or cloud consent not granted")
+
+    req = ModelRequest(
+        prompt="Convert ISL sign sequence [HELLO, FRIEND] to English.",
+        system_prompt="Output strictly valid JSON: {\"sentence\": \"string\"}",
+        task_type=TaskType.LINGUISTIC_RECONSTRUCTION,
+        structured_json=True,
+        allow_cloud=True
+    )
+    resp = await model_orchestrator.gemini.generate(req)
+    assert resp.status == "success"
+    assert resp.provider == ProviderType.GEMINI_API.value
+    assert resp.content != ""
+    assert resp.latency_ms > 0
+    assert resp.token_usage.get("total_tokens", 0) > 0

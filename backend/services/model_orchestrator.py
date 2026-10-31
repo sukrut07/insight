@@ -149,7 +149,7 @@ class GeminiProvider(BaseAIProvider):
                 error_message="Gemini API key is not configured.",
                 is_fallback=True
             )
-        if not request.allow_cloud and not settings.CLOUD_CONSENT_GRANTED:
+        if not request.allow_cloud or not settings.CLOUD_CONSENT_GRANTED:
             return ModelResponse(
                 provider=ProviderType.GEMINI_API.value,
                 model=self.model,
