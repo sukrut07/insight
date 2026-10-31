@@ -118,17 +118,20 @@ class LanguageRouter:
         # High: >= 0.75, Medium: 0.45 - 0.75, Low: < 0.45
         if confidence >= 0.75 and label not in ["NONE", "UNKNOWN"]:
             confidence_tier = "high"
-            status = "high_confidence"
+            status = "recognized"
+            recognition_status = "high_confidence"
             display_label = label
             message = "Sign successfully recognised."
         elif confidence >= 0.45 and label not in ["NONE", "UNKNOWN"]:
             confidence_tier = "medium"
-            status = "medium_confidence"
+            status = "uncertain"
+            recognition_status = "medium_confidence"
             display_label = label
             message = "Possible interpretation. Confirmation required."
         else:
             confidence_tier = "low"
-            status = "low_confidence"
+            status = "unsupported"
+            recognition_status = "low_confidence"
             display_label = "NONE"
             message = "Sign not recognised. Please reposition hands or repeat gesture."
 
@@ -141,6 +144,7 @@ class LanguageRouter:
             "model_version": cfg.get("model_version", "isl_v1"),
             "recognition_type": recognition_type,
             "status": status,
+            "recognition_status": recognition_status,
             "message": message,
             "is_stable": is_stable,
             "raw_prediction": raw_prediction or {}
