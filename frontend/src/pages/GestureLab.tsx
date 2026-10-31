@@ -14,7 +14,10 @@ import { MultimodalInspector } from '../components/MultimodalInspector';
 import { DisagreementBanner } from '../components/DisagreementBanner';
 import { CameraPermissionDialog } from '../components/CameraPermissionDialog';
 import { SignLanguageSelector } from '../components/SignLanguageSelector';
+import { GestureLabKpis } from '../components/GestureLabKpis';
+import { RecognitionExplanationPanel } from '../components/RecognitionExplanationPanel';
 import {
+
   Play,
   Pause,
   Trash2,
@@ -272,6 +275,9 @@ export const GestureLab: React.FC = () => {
 
       {/* Disagreement banner if Gemma flagged an ambiguity */}
       <DisagreementBanner />
+
+      {/* Live Session Telemetry & KPI Cards */}
+      <GestureLabKpis />
 
       {/* =========================================================================
           MAIN WORKSPACE GRID: CAMERA VIEWPORT & RECOGNITION PANEL
@@ -628,6 +634,9 @@ export const GestureLab: React.FC = () => {
           <MultimodalInspector />
         </div>
       )}
+
+      {/* Recognition Explanation & Physics Panel */}
+      <RecognitionExplanationPanel />
 
       {/* Camera Permission Dialog */}
       <CameraPermissionDialog
