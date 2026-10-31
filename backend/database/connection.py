@@ -5,10 +5,17 @@ from backend.config import settings
 
 
 def get_db_connection() -> sqlite3.Connection:
-    settings.DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(settings.DATABASE_PATH), check_same_thread=False)
+    try:
+        settings.DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(settings.DATABASE_PATH), check_same_thread=False)
+    except (sqlite3.OperationalError, PermissionError, OSError):
+        import tempfile
+        from pathlib import Path
+        tmp_db = Path(tempfile.gettempdir()) / "signbridge.db"
+        conn = sqlite3.connect(str(tmp_db), check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 
 def init_db():
