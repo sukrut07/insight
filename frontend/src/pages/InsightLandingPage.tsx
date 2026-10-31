@@ -46,14 +46,16 @@ export const InsightLandingPage: React.FC = () => {
   };
 
   return (
-    <div className="relative space-y-24 sm:space-y-32 overflow-hidden">
+    <div className="relative overflow-hidden">
       {/* Interactive Pastel Dot Canvas Background & Cursor Trail */}
       <InteractiveDotCanvas />
 
-      {/* =========================================================================
-          SECTION 2: HERO
-         ========================================================================= */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-12">
+      {/* Main Content Sections */}
+      <div className="relative space-y-20 sm:space-y-28">
+        {/* =========================================================================
+            SECTION 2: HERO
+           ========================================================================= */}
+        <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Column: Bold Typography & Narrative */}
           <motion.div
@@ -1019,5 +1021,6 @@ export const InsightLandingPage: React.FC = () => {
         </div>
       </footer>
     </div>
-  );
+  </div>
+);
 };
