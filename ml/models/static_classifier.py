@@ -1,18 +1,35 @@
-"""Static ISL Gesture Classifiers: Random Forest Baseline & PyTorch MLP."""
 from pathlib import Path
 from typing import Tuple, Dict, Any, Optional
-import joblib
 import numpy as np
-import torch
-import torch.nn as nn
-from sklearn.ensemble import RandomForestClassifier
+
+try:
+    import joblib
+    from sklearn.ensemble import RandomForestClassifier
+    SKLEARN_AVAILABLE = True
+except Exception:
+    joblib = None
+    RandomForestClassifier = None
+    SKLEARN_AVAILABLE = False
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+    _BaseModule = nn.Module
+except Exception:
+    torch = None
+    nn = None
+    TORCH_AVAILABLE = False
+    _BaseModule = object
 
 
-class PyTorchStaticMLP(nn.Module):
+class PyTorchStaticMLP(_BaseModule):
     """Multi-Layer Perceptron for static ISL hand gesture classification."""
 
     def __init__(self, input_dim: int = 148, num_classes: int = 15):
         super().__init__()
+        if not TORCH_AVAILABLE:
+            raise RuntimeError("PyTorch is not installed. Use dedicated inference environment.")
         self.net = nn.Sequential(
             nn.Linear(input_dim, 128),
             nn.BatchNorm1d(128),
@@ -25,7 +42,7 @@ class PyTorchStaticMLP(nn.Module):
             nn.Linear(64, num_classes)
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: Any) -> Any:
         return self.net(x)
 
 
@@ -35,22 +52,31 @@ class StaticGestureClassifier:
     def __init__(self, model_type: str = "rf", num_classes: int = 15):
         self.model_type = model_type.lower()
         self.num_classes = num_classes
-        self.rf_model: Optional[RandomForestClassifier] = None
-        self.mlp_model: Optional[PyTorchStaticMLP] = None
-        self.device = torch.device(
-            "mps" if torch.backends.mps.is_available() else "cpu"
-        )
+        self.rf_model: Optional[Any] = None
+        self.mlp_model: Optional[Any] = None
+        if TORCH_AVAILABLE and torch is not None:
+            self.device = torch.device(
+                "mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu"
+            )
+        else:
+            self.device = "cpu"
 
         if self.model_type == "rf":
-            self.rf_model = RandomForestClassifier(
-                n_estimators=100,
-                max_depth=16,
-                min_samples_split=2,
-                random_state=42,
-                class_weight="balanced"
-            )
+            if SKLEARN_AVAILABLE and RandomForestClassifier is not None:
+                self.rf_model = RandomForestClassifier(
+                    n_estimators=100,
+                    max_depth=16,
+                    min_samples_split=2,
+                    random_state=42,
+                    class_weight="balanced"
+                )
+            else:
+                self.rf_model = None
         elif self.model_type == "mlp":
-            self.mlp_model = PyTorchStaticMLP(input_dim=148, num_classes=num_classes).to(self.device)
+            if TORCH_AVAILABLE:
+                self.mlp_model = PyTorchStaticMLP(input_dim=148, num_classes=num_classes).to(self.device)
+            else:
+                self.mlp_model = None
         else:
             raise ValueError(f"Unknown model_type: {model_type}")
 

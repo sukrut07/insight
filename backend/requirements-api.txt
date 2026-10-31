@@ -1,0 +1,20 @@
+# ==============================================================================
+# iNSIGHT — Lightweight Serverless & API Dependencies (Vercel / Cloud Functions)
+# Bundle footprint: ~75 MB uncompressed (< 15% of Vercel standard 500 MB limit)
+# ==============================================================================
+
+# Core FastAPI & ASGI Web Server
+fastapi>=0.110.0,<1.0.0
+uvicorn>=0.28.0,<1.0.0
+pydantic>=2.6.0,<3.0.0
+pydantic-settings>=2.2.0,<3.0.0
+python-multipart>=0.0.9
+python-dotenv>=1.0.0
+httpx>=0.27.0
+websockets>=12.0
+
+# Mathematical Invariant Kinematics Engine (Fast landmark geometric scoring)
+numpy>=1.24.0,<2.0.0
+
+# Optional Open-Weight Multimodal Intelligence Client
+ollama>=0.1.7

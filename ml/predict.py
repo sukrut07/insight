@@ -44,14 +44,24 @@ class GesturePredictor:
         self.last_emitted_word: Optional[str] = None
         self.emitted_cooldown: int = 0
 
-        # Load models
+        # Lazy model references (loaded on-demand during inference)
         self.static_clf: Optional[StaticGestureClassifier] = None
         self.temporal_clf: Optional[TemporalGestureClassifier] = None
+        self._models_loaded: bool = False
+
+    def _ensure_models_loaded(self):
+        """Lazy loads Static Random Forest and Temporal BiLSTM only when inference is requested."""
+        if self._models_loaded:
+            return
+        self._models_loaded = True
 
         rf_path = MODELS_DIR / "static_rf.joblib"
         if rf_path.exists():
-            self.static_clf = StaticGestureClassifier(model_type="rf", num_classes=self.num_classes)
-            self.static_clf.load(str(rf_path))
+            try:
+                self.static_clf = StaticGestureClassifier(model_type="rf", num_classes=self.num_classes)
+                self.static_clf.load(str(rf_path))
+            except Exception:
+                self.static_clf = None
 
         lstm_path = MODELS_DIR / "temporal_lstm.pt"
         if lstm_path.exists():
@@ -71,6 +81,7 @@ class GesturePredictor:
 
         Returns prediction dictionary with smoothed label, confidence, and stability status.
         """
+        self._ensure_models_loaded()
         if self.emitted_cooldown > 0:
             self.emitted_cooldown -= 1
 

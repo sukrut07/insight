@@ -1,0 +1,14 @@
+# ==============================================================================
+# iNSIGHT — Dedicated ML Inference Server Dependencies (Docker / Render / Railway)
+# For running heavy Bi-LSTM neural inference, MediaPipe CV, and scikit-learn models.
+# ==============================================================================
+
+-r requirements-api.txt
+
+# Machine Learning & Deep Learning Inference
+scikit-learn>=1.4.0
+joblib>=1.3.0
+torch>=2.2.0
+pillow>=10.2.0
+opencv-python-headless>=4.9.0.80
+mediapipe>=0.10.9
