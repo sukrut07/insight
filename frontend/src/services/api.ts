@@ -22,6 +22,16 @@ export async function fetchModelStatus(): Promise<ModelStatus> {
   return res.json();
 }
 
+export async function fetchLanguageModels() {
+  const res = await fetch(`${API_BASE}/languages/models`);
+  return res.json();
+}
+
+export async function fetchProviderStatus() {
+  const res = await fetch(`${API_BASE}/gemma/providers`);
+  return res.json();
+}
+
 export async function fetchVocabulary(): Promise<VocabularyItem[]> {
   const res = await fetch(`${API_BASE}/vocabulary`);
   const data = await res.json();

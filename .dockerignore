@@ -9,3 +9,10 @@ frontend/node_modules
 frontend/dist
 .DS_Store
 *.log
+models/huggingface
+data/feedback
+data/raw
+*.db
+*.sqlite3
+.env
+.env.local

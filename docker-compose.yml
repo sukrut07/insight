@@ -1,24 +1,46 @@
 version: '3.8'
 
 services:
-  signbridge:
+  insight:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: signbridge_app
+    container_name: insight_app
     restart: unless-stopped
     ports:
       - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      - APP_NAME=SignBridge
+      - APP_NAME=iNSIGHT
+      - APP_ENV=production
+      - HOST=0.0.0.0
+      - PORT=8000
       - DEFAULT_PROVIDER=local_ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - PRIMARY_LLM=gemma4:e4b
       - FALLBACK_LLM=gemma4:e2b
-      - PORT=8000
+      - CLOUD_CONSENT_GRANTED=false
     volumes:
       - ./data:/app/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
+      start_period: 15s
       retries: 3
+
+  # Optional containerized Ollama service (Run with: docker compose --profile with-ollama up)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: insight_ollama
+    profiles:
+      - with-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+volumes:
+  ollama_models:

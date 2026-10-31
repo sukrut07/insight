@@ -14,6 +14,7 @@ import { MultimodalInspector } from '../components/MultimodalInspector';
 import { DisagreementBanner } from '../components/DisagreementBanner';
 import { CameraPermissionDialog } from '../components/CameraPermissionDialog';
 import { SignLanguageSelector } from '../components/SignLanguageSelector';
+import { VoiceController } from '../components/VoiceController';
 import {
   Play,
   Pause,
@@ -538,6 +539,16 @@ export const LiveTranslator: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Bidirectional Voice Controller (TTS & STT for Hearing Partner) */}
+          <VoiceController
+            currentTranslation={refinedTranslation?.refined_sentence || ''}
+            onVoiceTranscript={(text) => {
+              if (text) {
+                addToken(text.toUpperCase(), 0.95);
+              }
+            }}
+          />
 
           {/* Quick Translation History Drawer */}
           <div className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">

@@ -6,7 +6,7 @@ import httpx
 
 OLLAMA_URL = "http://localhost:11434"
 
-async def test_model(model_tag: str, prompt: str, structured_json: bool = True):
+async def execute_model_inference(model_tag: str, prompt: str, structured_json: bool = True):
     print(f"\n=======================================================")
     print(f"Testing Live Inference: {model_tag}")
     print(f"=======================================================")
@@ -73,10 +73,10 @@ Convert recognized ISL signs [HELLO, HOW, YOU] into a structured English sentenc
 Output strictly JSON schema: {"sentence": "string", "confidence": float, "notes": "string"}"""
 
     # 1. Test Primary Model gemma4:e4b
-    res_e4b = await test_model("gemma4:e4b", test_prompt, structured_json=True)
+    res_e4b = await execute_model_inference("gemma4:e4b", test_prompt, structured_json=True)
     
     # 2. Test Fallback Model gemma4:e2b
-    res_e2b = await test_model("gemma4:e2b", test_prompt, structured_json=True)
+    res_e2b = await execute_model_inference("gemma4:e2b", test_prompt, structured_json=True)
     
     print("\n=======================================================")
     print("SUMMARY OF LIVE OLLAMA TESTS")
