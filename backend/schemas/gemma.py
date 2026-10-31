@@ -91,3 +91,25 @@ class GemmaEvaluationStats(BaseModel):
     disagreement_rate: float
     average_latency_ms: float
     recent_disagreements: List[DisagreementEvent]
+
+
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="'user' | 'assistant' | 'system'")
+    content: str = Field(..., description="Message text")
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., description="User query about sign language, dictionary, or practice")
+    conversation_history: List[ChatMessage] = Field(default_factory=list)
+    language_context: Optional[str] = "ISL"
+    current_sign_context: Optional[str] = None
+    allow_cloud: bool = True
+
+
+class ChatResponse(BaseModel):
+    response: str
+    provider: str
+    model: str
+    latency_ms: float
+    error: Optional[str] = None
+
