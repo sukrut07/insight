@@ -15,6 +15,7 @@ import { TranslationEditor } from './pages/TranslationEditor';
 import { ModelStatus } from './pages/ModelStatus';
 import { DataCollection } from './pages/DataCollection';
 import { Analytics } from './pages/Analytics';
+import { SignWorkbook } from './pages/SignWorkbook';
 
 export const App: React.FC = () => {
   const { activeTab, setActiveTab, accessibility } = useStore();
@@ -35,6 +36,7 @@ export const App: React.FC = () => {
       <main className="flex-1">
         {isLanding && <InsightLandingPage />}
         {(activeTab === 'gesture-lab' || activeTab === 'translator') && <GestureLab />}
+        {activeTab === 'workbook' && <SignWorkbook />}
         {activeTab === 'connect' && <ConnectPage />}
         {activeTab === 'research' && <ResearchLab />}
         {activeTab === 'learn' && <SignLearningCentre />}

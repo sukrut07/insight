@@ -249,6 +249,7 @@ export interface AccessibilitySettings {
 export type ActiveTab =
   | 'home'
   | 'gesture-lab'
+  | 'workbook'
   | 'connect'
   | 'learn'
   | 'dictionary'
