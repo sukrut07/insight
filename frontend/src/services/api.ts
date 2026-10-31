@@ -248,16 +248,115 @@ export async function fetchLanguageAlphabet(languageId: string) {
 
 export async function orchestrateTranslation(payload: {
   language: string;
-  signs: { word: string; confidence: number }[];
+  signs: { word: string; label?: string; confidence: number }[];
   visual_frame_base64?: string | null;
   context_notes?: string;
 }) {
-  const res = await fetch(`${API_BASE}/translation/orchestrate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  return res.json();
+  const normalizedSigns = payload.signs.map((s) => ({
+    word: s.word,
+    label: s.label || s.word,
+    confidence: s.confidence,
+  }));
+
+  try {
+    const res = await fetch(`${API_BASE}/translation/orchestrate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, signs: normalizedSigns }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && (data.readable_translation || data.refined_sentence)) {
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn('[Orchestrate] Network/Serverless fallback triggered:', err);
+  }
+
+  // Resilient linguistic reconstruction (Vercel serverless / offline safe)
+  return clientSideTranslateSequence(payload.language, normalizedSigns);
+}
+
+function clientSideTranslateSequence(
+  language: string,
+  signs: { word: string; confidence: number }[]
+) {
+  const tokens = signs.map((s) => s.word.trim().toUpperCase()).filter((w) => w && w !== 'NONE');
+  if (tokens.length === 0) {
+    return {
+      readable_translation: '',
+      refined_sentence: '',
+      grammar_notes: 'Empty token stream.',
+      language,
+      recognized_sequence: [],
+      provider: 'client_rule_engine',
+    };
+  }
+
+  const tokenStr = tokens.join(' ');
+  const phraseMap: Record<string, string> = {
+    'HELLO': 'Hello!',
+    'GOODBYE': 'Goodbye!',
+    'THANK_YOU': 'Thank you.',
+    'PLEASE': 'Please.',
+    'HELP': 'Please help me.',
+    'YES': 'Yes.',
+    'NO': 'No.',
+    'WATER': 'I need water.',
+    'FOOD': 'I need food.',
+    'I WATER': 'I would like some water.',
+    'I FOOD': 'I would like some food.',
+    'MY NAME': 'My name is...',
+  };
+
+  if (phraseMap[tokenStr]) {
+    return {
+      readable_translation: phraseMap[tokenStr],
+      refined_sentence: phraseMap[tokenStr],
+      grammar_notes: `Direct ${language} phrase reconstruction.`,
+      language,
+      recognized_sequence: tokens,
+      provider: 'client_rule_engine',
+    };
+  }
+
+  const tokSet = new Set(tokens);
+  const parts: string[] = [];
+  if (tokSet.has('HEY') || tokSet.has('HELLO')) parts.push('Hey,');
+  if (tokSet.has('SORRY')) parts.push('I am sorry.');
+  if (tokSet.has('PLEASE')) parts.push('Please,');
+  if (tokSet.has('THANK_YOU')) parts.push('Thank you.');
+  if (tokSet.has('HELP')) parts.push('could you help me?');
+
+  const handled = new Set(['HEY', 'HELLO', 'SORRY', 'PLEASE', 'THANK_YOU', 'HELP']);
+  const remainder = tokens.filter((t) => !handled.has(t)).map((t) => t.toLowerCase());
+
+  if (remainder.length > 0) {
+    const remStr = remainder.join(' ');
+    if (tokSet.has('WHAT') || tokSet.has('WHERE') || tokSet.has('WHY') || tokSet.has('HOW')) {
+      if (remStr.startsWith('what') || remStr.startsWith('where')) {
+        parts.push(`${remStr.charAt(0).toUpperCase() + remStr.slice(1)}?`);
+      } else {
+        parts.push(`what about ${remStr}?`);
+      }
+    } else {
+      parts.push(`${remStr.charAt(0).toUpperCase() + remStr.slice(1)}.`);
+    }
+  }
+
+  const translation = parts.length > 0
+    ? parts.join(' ')
+    : tokens.map((t) => t.toLowerCase()).join(' ').replace(/^./, (c) => c.toUpperCase()) + '.';
+
+  return {
+    readable_translation: translation,
+    refined_sentence: translation,
+    grammar_notes: `Client-side linguistic reconstruction (${language} SOV to natural English).`,
+    language,
+    recognized_sequence: tokens,
+    provider: 'client_rule_engine',
+  };
 }
 
 export async function identifySign(payload: {

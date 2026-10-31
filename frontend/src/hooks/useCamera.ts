@@ -24,7 +24,7 @@ export type CameraStatus =
   | 'denied';
 
 interface UseCameraOptions {
-  onFrame?: (base64Frame: string) => void;
+  onFrame?: (base64Frame: string, videoElement?: HTMLVideoElement | null) => void;
   targetFps?: number;
   autoStart?: boolean; // Default false as per requirements
 }
@@ -144,7 +144,7 @@ export function useCamera({
 
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const base64 = canvas.toDataURL('image/jpeg', 0.65);
-      onFrame(base64);
+      onFrame(base64, video);
     }, intervalMs);
 
     return () => {

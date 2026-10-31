@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useStore } from '../store/useStore';
 import { RecognitionMessage } from '../types';
+import { clientMediaPipeEngine } from '../services/mediapipe/clientMediaPipeEngine';
 
 export function useRecognitionWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -25,6 +26,11 @@ export function useRecognitionWebSocket() {
     activeLanguage,
   } = useStore();
 
+  // Prewarm client-side MediaPipe WASM model in background
+  useEffect(() => {
+    clientMediaPipeEngine.initialize().catch(() => {});
+  }, []);
+
   const connect = useCallback(() => {
     if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
       return;
@@ -32,7 +38,7 @@ export function useRecognitionWebSocket() {
 
     if (reconnectAttemptRef.current >= MAX_RECONNECT_ATTEMPTS) {
       console.info(
-        '[WebSocket] Reconnect limit reached. If deployed on Vercel serverless, please connect via dedicated inference backend (set VITE_WS_URL) or start local backend.'
+        '[WebSocket] Operating in client-side MediaPipe mode (Vercel Serverless / offline compatible).'
       );
       return;
     }
@@ -95,20 +101,19 @@ export function useRecognitionWebSocket() {
               1000 * Math.pow(1.5, reconnectAttemptRef.current),
               8000
             );
-            console.log(`[WebSocket] Disconnected. Reconnecting in ${Math.round(backoffDelay)}ms (attempt ${reconnectAttemptRef.current}/${MAX_RECONNECT_ATTEMPTS})...`);
             reconnectTimeoutRef.current = window.setTimeout(connect, backoffDelay);
           } else {
-            console.warn('[WebSocket] Persistent recognition connection paused. Backend requires dedicated WebSocket server.');
+            console.info('[WebSocket] Running in client-side MediaPipe WASM mode (Vercel Serverless / standalone).');
           }
         }
       };
 
-      ws.onerror = (err) => {
-        console.warn('[WebSocket] Connection failed. Note: Vercel Serverless requires separate persistent WebSocket host (VITE_WS_URL).', err);
+      ws.onerror = () => {
+        // Fallback to client-side MediaPipe without spamming error alerts
         ws.close();
       };
     } catch (e) {
-      console.warn('[WebSocket] Initialization error:', e);
+      console.warn('[WebSocket] Init fallback to client MediaPipe:', e);
     }
   }, [addToken, isPaused, activeLanguage]);
 
@@ -137,17 +142,44 @@ export function useRecognitionWebSocket() {
     };
   }, [connect]);
 
-  // Frame sender
-  const sendFrame = useCallback((base64Image: string) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: 'frame',
-          image: base64Image,
-        })
-      );
-    }
-  }, []);
+  // Frame sender with seamless client-side MediaPipe fallback
+  const sendFrame = useCallback(
+    (base64Image: string, videoElement?: HTMLVideoElement | null) => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(
+          JSON.stringify({
+            type: 'frame',
+            image: base64Image,
+          })
+        );
+        return;
+      }
+
+      // Client-Side MediaPipe Engine execution
+      if (videoElement && videoElement.readyState >= 2) {
+        const result = clientMediaPipeEngine.processVideoFrame(videoElement, activeLanguage);
+        if (result) {
+          useStore.setState({
+            handsDetected: result.hands_detected,
+            leftHand: result.left_hand,
+            rightHand: result.right_hand,
+            currentLabel: result.label,
+            rawLabel: result.raw_label,
+            confidence: result.confidence,
+            isStable: result.is_stable,
+            fps: result.fps,
+            latencyMs: result.latency_ms,
+            annotatedFrame: result.annotated_frame,
+          });
+
+          if (result.new_word_emitted && !isPaused) {
+            addToken(result.new_word_emitted, result.confidence || 0.90);
+          }
+        }
+      }
+    },
+    [activeLanguage, isPaused, addToken]
+  );
 
   // Language changer
   const sendLanguage = useCallback((lang: string) => {
@@ -163,6 +195,7 @@ export function useRecognitionWebSocket() {
 
   // Buffer reset
   const sendReset = useCallback(() => {
+    clientMediaPipeEngine.reset();
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: 'reset' }));
     }

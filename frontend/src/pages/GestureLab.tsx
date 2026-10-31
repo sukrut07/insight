@@ -99,9 +99,9 @@ export const GestureLab: React.FC = () => {
     switchCamera,
     isActive: isCameraActive,
   } = useCamera({
-    onFrame: (b64) => {
+    onFrame: (b64, videoEl) => {
       if (!isPaused && isCameraActive) {
-        sendFrame(b64);
+        sendFrame(b64, videoEl || videoRef.current);
       }
     },
     targetFps: 25,
@@ -149,7 +149,7 @@ export const GestureLab: React.FC = () => {
     if (sentenceTokens.length === 0) return;
     setIsRefining(true);
     try {
-      const payload = sentenceTokens.map((t) => ({ word: t.word, confidence: t.confidence }));
+      const payload = sentenceTokens.map((t) => ({ word: t.word, label: t.word, confidence: t.confidence }));
       const result = await orchestrateTranslation({
         language: activeLanguage,
         signs: payload,

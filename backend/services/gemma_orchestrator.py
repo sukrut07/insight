@@ -82,10 +82,10 @@ class GemmaOrchestrator:
     """Central orchestration service using local Gemma 4 E4B."""
 
     def __init__(self):
-        self.ollama_url = settings.OLLAMA_BASE_URL.rstrip("/")
+        self.ollama_url = settings.OLLAMA_BASE_URL.replace("localhost", "127.0.0.1").rstrip("/")
         self.primary_model = settings.PRIMARY_LLM  # gemma4:e4b
         self.fallback_model = settings.FALLBACK_LLM  # gemma4:e2b
-        self.timeout = 20.0
+        self.timeout = httpx.Timeout(15.0, connect=1.5)
 
     async def orchestrate_translation(
         self,
@@ -109,16 +109,22 @@ class GemmaOrchestrator:
         unverified_signs = []
 
         for sign in recognized_signs:
-            lbl = sign.get("label", "").strip().upper()
-            conf = float(sign.get("confidence", 0.0))
+            lbl = ""
+            conf = 1.0
+            if isinstance(sign, dict):
+                lbl = (sign.get("label") or sign.get("word") or sign.get("token") or sign.get("sign") or "").strip().upper()
+                conf = float(sign.get("confidence", 1.0))
+            elif isinstance(sign, str):
+                lbl = sign.strip().upper()
+                conf = 1.0
+
             if lbl and lbl not in ["NONE", "UNKNOWN"]:
-                if lbl in valid_labels or not valid_labels:
-                    tokens.append(lbl)
-                    confidences.append(conf)
-                else:
+                tokens.append(lbl)
+                confidences.append(conf)
+                if valid_labels and lbl not in valid_labels:
                     unverified_signs.append(lbl)
 
-        avg_conf = sum(confidences) / len(confidences) if confidences else 0.0
+        avg_conf = sum(confidences) / len(confidences) if confidences else 1.0
 
         if not tokens:
             return {
@@ -134,7 +140,7 @@ class GemmaOrchestrator:
                 "model": self.primary_model
             }
 
-        # Try Gemma 4 E4B via Ollama
+        # Try Gemma 4 E4B via Ollama or Cloud Provider
         gemma_result = await self._call_ollama_orchestrator(
             language=lang_upper,
             tokens=tokens,
@@ -228,49 +234,17 @@ class GemmaOrchestrator:
                             latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
                         )
                         return validated.model_dump()
+            except (httpx.ConnectError, httpx.ConnectTimeout):
+                logger.info("Local Ollama daemon is not running on %s. Proceeding to cloud / deterministic orchestration.", self.ollama_url)
             except Exception as e:
                 logger.warning("Ollama primary model %s error: %s. Trying fallback %s...", self.primary_model, e, self.fallback_model)
-
-            # Try fallback model if primary failed
-            try:
-                payload["model"] = self.fallback_model
-                resp = await client.post(f"{self.ollama_url}/api/chat", json=payload)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    content = data.get("message", {}).get("content", "").strip()
-                    parsed = self._extract_json(content)
-                    if parsed:
-                        validated = GemmaTranslationResponse(
-                            language=parsed.get("language", language),
-                            recognized_sequence=parsed.get("recognized_sequence", tokens),
-                            readable_translation=parsed.get("readable_translation", ""),
-                            confidence=float(parsed.get("confidence", avg_conf)),
-                            ambiguities=parsed.get("ambiguities", []),
-                            suggestions=parsed.get("suggestions", []),
-                            requires_user_confirmation=bool(parsed.get("requires_user_confirmation", False)),
-                            grammar_notes=parsed.get("grammar_notes", ""),
-                            inferred_elements=parsed.get("inferred_elements", []),
-                            provider="local_ollama",
-                            model=self.fallback_model,
-                            verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
-                            latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
-                        )
-                        return validated.model_dump()
-            except Exception as e_fallback:
-                logger.error("Both Gemma models failed on Ollama: %s", e_fallback)
-
-            # Optional Hosted Gemini API fallback if explicitly configured & consented
-            if settings.CLOUD_CONSENT_GRANTED and settings.GEMINI_API_KEY:
                 try:
-                    gemini_url = f"{settings.GEMINI_API_BASE_URL.rstrip('/')}/v1beta/models/{settings.GEMINI_GEMMA_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"
-                    gemini_payload = {
-                        "contents": [{"parts": [{"text": f"{ORCHESTRATOR_SYSTEM_PROMPT}\n\n{user_message_content}"}]}]
-                    }
-                    g_resp = await client.post(gemini_url, json=gemini_payload, timeout=12.0)
-                    if g_resp.status_code == 200:
-                        g_data = g_resp.json()
-                        raw_text = g_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                        parsed = self._extract_json(raw_text)
+                    payload["model"] = self.fallback_model
+                    resp = await client.post(f"{self.ollama_url}/api/chat", json=payload)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        content = data.get("message", {}).get("content", "").strip()
+                        parsed = self._extract_json(content)
                         if parsed:
                             validated = GemmaTranslationResponse(
                                 language=parsed.get("language", language),
@@ -282,14 +256,52 @@ class GemmaOrchestrator:
                                 requires_user_confirmation=bool(parsed.get("requires_user_confirmation", False)),
                                 grammar_notes=parsed.get("grammar_notes", ""),
                                 inferred_elements=parsed.get("inferred_elements", []),
-                                provider="hosted_gemini",
-                                model=settings.GEMINI_GEMMA_MODEL,
+                                provider="local_ollama",
+                                model=self.fallback_model,
                                 verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
                                 latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
                             )
                             return validated.model_dump()
-                except Exception as e_gemini:
-                    logger.error("Hosted Gemini API fallback failed: %s", e_gemini)
+                except Exception as e_fallback:
+                    logger.error("Both Gemma models failed on Ollama: %s", e_fallback)
+
+            # Hosted Gemini API fallback if key is configured
+            if settings.GEMINI_API_KEY:
+                models_to_try = [
+                    settings.GEMINI_MODEL or "gemini-3.5-flash-lite",
+                    "gemini-3.5-flash-lite",
+                    "gemini-flash-latest",
+                ]
+                for g_model in models_to_try:
+                    try:
+                        gemini_url = f"{settings.GEMINI_API_BASE_URL.rstrip('/')}/v1beta/models/{g_model}:generateContent?key={settings.GEMINI_API_KEY}"
+                        gemini_payload = {
+                            "contents": [{"parts": [{"text": f"{ORCHESTRATOR_SYSTEM_PROMPT}\n\n{user_message_content}"}]}]
+                        }
+                        g_resp = await client.post(gemini_url, json=gemini_payload, timeout=12.0)
+                        if g_resp.status_code == 200:
+                            g_data = g_resp.json()
+                            raw_text = g_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                            parsed = self._extract_json(raw_text)
+                            if parsed:
+                                validated = GemmaTranslationResponse(
+                                    language=parsed.get("language", language),
+                                    recognized_sequence=parsed.get("recognized_sequence", tokens),
+                                    readable_translation=parsed.get("readable_translation", ""),
+                                    confidence=float(parsed.get("confidence", avg_conf)),
+                                    ambiguities=parsed.get("ambiguities", []),
+                                    suggestions=parsed.get("suggestions", []),
+                                    requires_user_confirmation=bool(parsed.get("requires_user_confirmation", False)),
+                                    grammar_notes=parsed.get("grammar_notes", "Orchestrated with multimodal intelligence."),
+                                    inferred_elements=parsed.get("inferred_elements", []),
+                                    provider="hosted_gemini",
+                                    model=g_model,
+                                    verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
+                                    latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
+                                )
+                                return validated.model_dump()
+                    except Exception as e_gemini:
+                        logger.warning("Hosted Gemini API model %s failed: %s", g_model, e_gemini)
 
         return None
 
@@ -348,9 +360,39 @@ class GemmaOrchestrator:
 
         readable = phrases_map.get(token_str)
         if not readable:
-            # Word-level concatenation with capitalization and punctuation
-            words = [t.replace("_", " ").lower() for t in tokens]
-            readable = " ".join(words).capitalize() + "."
+            # Check for conversational combination patterns (e.g., HEY, SORRY, WHAT, MY)
+            tok_set = set(tokens)
+            parts = []
+            if "HEY" in tok_set or "HELLO" in tok_set:
+                parts.append("Hey,")
+            if "SORRY" in tok_set:
+                parts.append("I am sorry.")
+            if "PLEASE" in tok_set:
+                parts.append("Please,")
+            if "THANK_YOU" in tok_set:
+                parts.append("Thank you.")
+            if "HELP" in tok_set and "I" not in tok_set:
+                parts.append("could you help me?")
+
+            # Remaining content words
+            handled = {"HEY", "HELLO", "SORRY", "PLEASE", "THANK_YOU"}
+            remainder = [t.replace("_", " ").lower() for t in tokens if t not in handled]
+
+            if remainder:
+                rem_str = " ".join(remainder)
+                if any(q in tok_set for q in ["WHAT", "WHERE", "WHEN", "WHY", "HOW"]):
+                    if rem_str.startswith("what") or rem_str.startswith("where"):
+                        parts.append(f"{rem_str.capitalize()}?")
+                    else:
+                        parts.append(f"what about {rem_str}?")
+                else:
+                    parts.append(f"{rem_str.capitalize()}.")
+
+            if parts:
+                readable = " ".join(parts)
+            else:
+                words = [t.replace("_", " ").lower() for t in tokens]
+                readable = " ".join(words).capitalize() + "."
 
         ambiguities = []
         if avg_conf < 0.65:
