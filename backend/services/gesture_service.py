@@ -28,10 +28,12 @@ class GestureService:
             predictor = self.isl_predictor
             state_machine = None
 
-        if active_lang == "ISL":
-            raw_res = predictor.process_frame(detected_hands)
+        if active_lang in ["ISL", "BSL", "ASL"]:
+            from ml.model_registry import model_registry
+            recognizer = model_registry.get_recognizer(active_lang)
+            raw_res = recognizer.predict_frame(detected_hands)
             lbl = raw_res.get("label", "NONE")
-            conf = raw_res.get("confidence", 0.0)
+            conf = float(raw_res.get("confidence", 0.0))
             hands_count = raw_res.get("hands_detected", len(detected_hands))
 
             # Run state machine if available for temporal hysteresis & uncertainty gating
@@ -54,16 +56,20 @@ class GestureService:
             formatted = language_router.format_prediction_result(
                 label=lbl,
                 confidence=conf,
-                recognition_type="dynamic" if lbl in ["HELLO", "GOODBYE", "THANK_YOU", "PLEASE", "SORRY", "HELP", "FOOD", "WHAT", "WHERE"] else "static",
+                recognition_type=raw_res.get("recognition_type", "dynamic" if lbl in ["HELLO", "GOODBYE", "THANK_YOU", "PLEASE", "SORRY", "HELP", "FOOD", "WHAT", "WHERE", "NAME", "WANT", "NEED"] else "static"),
                 is_stable=state_info.get("is_stable", raw_res.get("is_stable", False)) if state_info else raw_res.get("is_stable", False),
                 raw_prediction=raw_res
             )
 
+            has_left = any(h.get("handedness") == "Left" for h in detected_hands) or raw_res.get("left_hand", False)
+            has_right = any(h.get("handedness") == "Right" for h in detected_hands) or raw_res.get("right_hand", False)
+
             # Merge hand detection & stream metadata
             formatted.update({
+                "language": active_lang,
                 "hands_detected": hands_count,
-                "left_hand": raw_res.get("left_hand", False),
-                "right_hand": raw_res.get("right_hand", False),
+                "left_hand": has_left,
+                "right_hand": has_right,
                 "new_word_emitted": state_info.get("new_segment_emitted", {}).get("gloss") if (state_info and state_info.get("new_segment_emitted")) else raw_res.get("new_word_emitted"),
                 "raw_label": raw_res.get("raw_label", lbl),
                 "state": state_info.get("state") if state_info else formatted.get("status"),
@@ -71,20 +77,6 @@ class GestureService:
                 "non_manual_markers": state_info.get("non_manual_markers", []) if state_info else []
             })
             return formatted
-
-        elif active_lang in ["BSL", "ASL"]:
-            from ml.model_registry import model_registry
-            recognizer = model_registry.get_recognizer(active_lang)
-            res = recognizer.predict_frame(detected_hands)
-            has_left = any(h.get("handedness") == "Left" for h in detected_hands)
-            has_right = any(h.get("handedness") == "Right" for h in detected_hands)
-            res.update({
-                "left_hand": has_left,
-                "right_hand": has_right,
-                "sentence_boundary": False,
-                "non_manual_markers": [],
-            })
-            return res
 
         # Fallback
         return {
