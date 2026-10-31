@@ -112,3 +112,67 @@ async def update_gemma_settings(payload: GemmaSettingsUpdate):
         "cloud_consent": gemma_service.cloud_consent_granted,
         "has_api_key": bool(gemma_service.gemini_api_key)
     }
+
+
+SYSTEM_CHAT_PROMPT = """You are INSIGHT's AI Sign Language & Accessibility Assistant.
+Your core mission is to assist users in learning sign language (ISL, BSL, ASL), understanding the dictionary, explaining proper hand orientation, joint angles, movement instructions, and helping troubleshoot why a gesture might not be recognized by the camera.
+
+CRITICAL INSTRUCTIONS:
+1. Ground your answers strictly in authentic sign language principles.
+2. Clearly distinguish between ISL (Indian Sign Language), BSL (British Sign Language), and ASL (American Sign Language). Remember that ISL and BSL frequently use two-handed fingerspelling alphabets, whereas ASL is single-handed.
+3. NEVER fabricate a sign translation or pretend a gesture exists if it is not a verified sign. If uncertain, state clearly: "I don't have verified sign data for that specific term yet."
+4. When helping troubleshoot recognition issues, explain:
+   - Camera framing: Hands must be fully inside the frame, visible at chest-to-head level.
+   - Lighting: Backlighting or dim lighting reduces MediaPipe landmark detection confidence.
+   - Hand orientation: Palm direction and finger angles are critical for distinct signs (e.g., flat hand vs open spread vs fist).
+   - Motion duration: Dynamic signs (e.g., HELLO wave, THANK YOU chin-to-forward) require 15-30 consecutive frames of movement, not a single snapshot.
+   - Left vs Right hand: Single-handed signs may need hand adaptation if performed with the non-dominant hand.
+5. Be supportive, concise, accessible, and structured with bullet points where helpful.
+"""
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_sign_assistant(payload: ChatRequest):
+    """Conversational assistant for sign language concepts, dictionary lookups, and recognition troubleshooting."""
+    from backend.services.model_orchestrator import model_orchestrator, ModelRequest, TaskType
+
+    history_str = ""
+    if payload.conversation_history:
+        for m in payload.conversation_history[-6:]:
+            history_str += f"{m.role.capitalize()}: {m.content}\n"
+
+    context_info = f"Current Selected Language: {payload.language_context or 'ISL'}\n"
+    if payload.current_sign_context:
+        context_info += f"Current Sign Focus: {payload.current_sign_context}\n"
+
+    user_prompt = f"{context_info}\nConversation History:\n{history_str}\nUser Question: {payload.message}\nAssistant:"
+
+    req = ModelRequest(
+        prompt=user_prompt,
+        system_prompt=SYSTEM_CHAT_PROMPT,
+        task_type=TaskType.LINGUISTIC_RECONSTRUCTION,
+        temperature=0.6,
+        max_tokens=600,
+        structured_json=False,
+        allow_cloud=payload.allow_cloud
+    )
+
+    resp = await model_orchestrator.generate(req)
+
+    if resp.status == "error":
+        return ChatResponse(
+            response="I am currently having difficulty connecting to the AI language engine. Please check your network connection or API settings, and click retry.",
+            provider=resp.provider,
+            model=resp.model,
+            latency_ms=resp.latency_ms,
+            error=resp.error_message
+        )
+
+    return ChatResponse(
+        response=resp.content.strip(),
+        provider=resp.provider,
+        model=resp.model,
+        latency_ms=resp.latency_ms,
+        error=None
+    )
+
