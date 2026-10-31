@@ -275,3 +275,42 @@ export async function identifySign(payload: {
   return res.json();
 }
 
+export async function fetchPlatformKpis() {
+  const res = await fetch(`${API_BASE}/languages/analytics/kpis`);
+  return res.json();
+}
+
+export async function fetchDictionaryAnalytics() {
+  const res = await fetch(`${API_BASE}/languages/analytics/dictionary`);
+  return res.json();
+}
+
+export async function fetchSignsByLanguage(languageId: string, category?: string) {
+  const url = category
+    ? `${API_BASE}/languages/${languageId}/signs?category=${encodeURIComponent(category)}`
+    : `${API_BASE}/languages/${languageId}/signs`;
+  const res = await fetch(url);
+  return res.json();
+}
+
+export async function fetchSignDetail(languageId: string, signId: number) {
+  const res = await fetch(`${API_BASE}/languages/${languageId}/signs/${signId}`);
+  return res.json();
+}
+
+export async function sendChatMessage(payload: {
+  message: string;
+  conversation_history?: Array<{ role: string; content: string }>;
+  language_context?: string;
+  current_sign_context?: string;
+  allow_cloud?: boolean;
+}) {
+  const res = await fetch(`${API_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+}
+
+

@@ -8,6 +8,9 @@ import {
   CurvedArrowDoodle,
   HandLineArt,
 } from '../components/Doodles';
+import { InteractiveDotCanvas } from '../components/InteractiveDotCanvas';
+import { LandingKpiCards } from '../components/LandingKpiCards';
+
 import {
   ArrowRight,
   ArrowDown,
@@ -43,7 +46,10 @@ export const InsightLandingPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-24 sm:space-y-32 overflow-hidden">
+    <div className="relative space-y-24 sm:space-y-32 overflow-hidden">
+      {/* Interactive Pastel Dot Canvas Background & Cursor Trail */}
+      <InteractiveDotCanvas />
+
       {/* =========================================================================
           SECTION 2: HERO
          ========================================================================= */}
@@ -204,6 +210,13 @@ export const InsightLandingPage: React.FC = () => {
             <span>✨</span>
           </div>
         </div>
+      </section>
+
+      {/* =========================================================================
+          PLATFORM LEVEL KPI METRICS (Direct from SQLite Database)
+         ========================================================================= */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LandingKpiCards />
       </section>
 
       {/* =========================================================================

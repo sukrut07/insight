@@ -16,6 +16,8 @@ import { ModelStatus } from './pages/ModelStatus';
 import { DataCollection } from './pages/DataCollection';
 import { Analytics } from './pages/Analytics';
 import { SignWorkbook } from './pages/SignWorkbook';
+import { GeminiChatbot } from './components/GeminiChatbot';
+
 
 export const App: React.FC = () => {
   const { activeTab, setActiveTab, accessibility } = useStore();
@@ -51,6 +53,7 @@ export const App: React.FC = () => {
       </main>
 
       <FeedbackModal />
+      <GeminiChatbot />
 
       {!isLanding && (
         <footer className="border-t-2 border-charcoal bg-white py-4 px-6 text-center text-xs text-charcoal-muted flex flex-col sm:flex-row items-center justify-between gap-2">
