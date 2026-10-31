@@ -58,28 +58,72 @@ async def select_language(payload: LanguageSelectRequest):
 @router.get("/{language_id}/vocabulary")
 async def get_language_vocabulary(language_id: str):
     """Returns vocabulary dictionary for specified language."""
+    from backend.database.models import get_signs_by_language
+    signs = get_signs_by_language(language_id=language_id)
     cfg = language_router.get_language_config(language_id)
-    if not cfg:
-        raise HTTPException(status_code=404, detail=f"Language '{language_id}' not found.")
     return {
         "language_id": language_id.upper(),
-        "name": cfg.get("name"),
-        "vocabulary": cfg.get("vocabulary", [])
+        "name": cfg.get("name") if cfg else language_id.upper(),
+        "total": len(signs),
+        "vocabulary": signs,
+        "signs": signs
     }
+
+
+@router.get("/{language_id}/signs")
+async def get_language_signs(
+    language_id: str,
+    category: Optional[str] = None,
+    search: Optional[str] = None
+):
+    """Returns filtered signs and anatomical feature descriptions from database."""
+    from backend.database.models import get_signs_by_language
+    signs = get_signs_by_language(language_id=language_id, category=category, search=search)
+    return {
+        "language_id": language_id.upper(),
+        "total": len(signs),
+        "signs": signs
+    }
+
+
+@router.get("/{language_id}/signs/{sign_id}")
+async def get_single_sign_detail(language_id: str, sign_id: str):
+    """Returns comprehensive sign detail, features, and model provenance."""
+    from backend.database.models import get_sign_detail
+    detail = get_sign_detail(sign_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Sign '{sign_id}' not found.")
+    return detail
+
+
+@router.get("/analytics/dictionary")
+async def get_dictionary_metrics(language_id: Optional[str] = None):
+    """Returns actual dictionary coverage metrics calculated directly from database."""
+    from backend.database.models import get_dictionary_analytics
+    return get_dictionary_analytics(language_id)
+
+
+@router.get("/analytics/kpis")
+async def get_kpi_metrics(active_language: Optional[str] = None):
+    """Returns transparent platform KPI metrics for landing page cards."""
+    from backend.database.models import get_platform_kpis
+    lang = active_language or language_router.get_active_language()
+    return get_platform_kpis(active_language=lang)
 
 
 @router.get("/{language_id}/alphabet")
 async def get_language_alphabet(language_id: str):
     """Returns manual fingerspelling alphabet for specified language."""
+    from backend.database.models import get_signs_by_language
+    alpha_signs = get_signs_by_language(language_id=language_id, category="alphabet")
     cfg = language_router.get_language_config(language_id)
-    if not cfg:
-        raise HTTPException(status_code=404, detail=f"Language '{language_id}' not found.")
     return {
         "language_id": language_id.upper(),
-        "name": cfg.get("name"),
-        "fingerspelling_type": cfg.get("fingerspelling_type"),
-        "alphabet_description": cfg.get("alphabet_description"),
-        "alphabet": cfg.get("alphabet", [])
+        "name": cfg.get("name") if cfg else language_id.upper(),
+        "fingerspelling_type": cfg.get("fingerspelling_type") if cfg else "standard",
+        "alphabet_description": cfg.get("alphabet_description") if cfg else "",
+        "total": len(alpha_signs),
+        "alphabet": alpha_signs
     }
 
 
