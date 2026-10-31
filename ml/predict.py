@@ -99,6 +99,24 @@ class GesturePredictor:
             if conf >= self.confidence_threshold:
                 label = self.id_to_label.get(pred_id, "UNKNOWN")
                 confidence = conf
+            elif metadata["left_detected"] and not metadata["right_detected"]:
+                # Signer adaptation: mirror single left hand to right hand to test single-handed signs
+                mirrored_hands = []
+                for h in detected_hands:
+                    mirrored_pts = [
+                        {"x": 1.0 - pt.get("x", 0.0), "y": pt.get("y", 0.0), "z": pt.get("z", 0.0)}
+                        for pt in h.get("landmarks", [])
+                    ]
+                    mirrored_hands.append({
+                        "handedness": "Right" if h.get("handedness") == "Left" else "Left",
+                        "landmarks": mirrored_pts
+                    })
+                from ml.normalize import process_dual_hand_landmarks
+                _, m_148, _ = process_dual_hand_landmarks(mirrored_hands)
+                m_pred_id, m_conf = self.static_clf.predict(m_148)
+                if m_conf >= self.confidence_threshold and m_conf > conf:
+                    label = self.id_to_label.get(m_pred_id, "UNKNOWN")
+                    confidence = m_conf
 
         self.prediction_history.append((label, confidence))
 
@@ -121,12 +139,21 @@ class GesturePredictor:
                     self.last_emitted_word = smoothed_label
                     self.emitted_cooldown = 15  # Cooldown frames (~0.5s) to avoid repeating same sign
 
+        # Calibrate confidence tiers
+        if confidence >= 0.75 and smoothed_label not in ("NONE", "UNKNOWN"):
+            confidence_tier = "high"
+        elif confidence >= 0.45 and smoothed_label not in ("NONE", "UNKNOWN"):
+            confidence_tier = "medium"
+        else:
+            confidence_tier = "low"
+
         return {
-            "label": smoothed_label,
+            "label": smoothed_label if confidence_tier != "low" else "NONE",
             "raw_label": label,
             "confidence": float(confidence),
+            "confidence_tier": confidence_tier,
             "is_stable": is_stable,
-            "new_word_emitted": new_word_emitted,
+            "new_word_emitted": new_word_emitted if confidence_tier == "high" else None,
             "hands_detected": metadata["hand_count"],
             "left_hand": metadata["left_detected"],
             "right_hand": metadata["right_detected"]

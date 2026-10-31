@@ -70,19 +70,38 @@ async def recognition_websocket(
                 if dt > 0:
                     fps_estimate = 0.9 * fps_estimate + 0.1 * (1.0 / dt)
 
+                # Tracking status
+                hands_count = pred_result.get("hands_detected", len(hands))
+                if hands_count == 0:
+                    tracking_status = "no_hands"
+                elif hands_count == 1:
+                    tracking_status = "tracking_single_hand"
+                else:
+                    tracking_status = "tracking_active"
+
+                conf = round(pred_result.get("confidence", 0.0), 3)
+                conf_tier = pred_result.get("confidence_tier")
+                if not conf_tier:
+                    conf_tier = "high" if conf >= 0.75 else ("medium" if conf >= 0.45 else "low")
+
+                latency_ms = round((time.perf_counter() - t_start) * 1000, 1)
+
                 response_payload = {
                     "type": "recognition_result",
                     "session_id": session.session_id,
                     "language": session.language,
                     "status": pred_result.get("status", "recognized"),
+                    "confidence_tier": conf_tier,
+                    "tracking_status": tracking_status,
+                    "message": pred_result.get("message", ""),
                     "state": pred_result.get("state", "detecting"),
                     "model_version": pred_result.get("model_version", "isl_v1"),
-                    "hands_detected": pred_result.get("hands_detected", 0),
+                    "hands_detected": hands_count,
                     "left_hand": pred_result.get("left_hand", False),
                     "right_hand": pred_result.get("right_hand", False),
                     "label": pred_result.get("label", "NONE"),
                     "raw_label": pred_result.get("raw_label", pred_result.get("label", "NONE")),
-                    "confidence": round(pred_result.get("confidence", 0.0), 3),
+                    "confidence": conf,
                     "is_stable": pred_result.get("is_stable", False),
                     "new_word_emitted": pred_result.get("new_word_emitted"),
                     "sentence_boundary": pred_result.get("sentence_boundary", False),
@@ -90,8 +109,24 @@ async def recognition_websocket(
                     "landmarks": hands,
                     "annotated_frame": annotated_b64,
                     "fps": round(fps_estimate, 1),
-                    "latency_ms": round((time.perf_counter() - t_start) * 1000, 1)
+                    "latency_ms": latency_ms
                 }
+
+                # Record stable high-confidence recognition to database
+                if pred_result.get("new_word_emitted"):
+                    try:
+                        from backend.database.models import record_recognition_result
+                        loop.run_in_executor(
+                            None,
+                            record_recognition_result,
+                            session.session_id,
+                            None,
+                            conf,
+                            conf_tier,
+                            latency_ms
+                        )
+                    except Exception:
+                        pass
 
                 await websocket.send_json(response_payload)
                 frame_queue.task_done()
