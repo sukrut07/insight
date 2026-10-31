@@ -34,15 +34,44 @@ class VocabularyService:
             with open(self.custom_plugin_path, "w") as f:
                 json.dump({"plugins": []}, f, indent=2)
 
-    def get_all_vocabulary(self) -> Dict[str, Any]:
-        """Loads core vocabulary merged with custom contributor plugins."""
+    def get_all_vocabulary(self, language: str = "ISL") -> Dict[str, Any]:
+        """Loads core vocabulary merged with custom contributor plugins, supporting ISL, BSL, and ASL."""
+        lang_upper = (language or "ISL").strip().upper()
+
+        if lang_upper in ("BSL", "ASL"):
+            cfg_path = PROJECT_ROOT / "config" / "languages" / f"{lang_upper.lower()}.json"
+            if cfg_path.exists():
+                try:
+                    with open(cfg_path, "r", encoding="utf-8") as f:
+                        cfg = json.load(f)
+                    signs = cfg.get("vocabulary", [])
+                    for s in signs:
+                        s["is_plugin"] = False
+                    return {
+                        "metadata": {
+                            "name": cfg.get("name", f"{lang_upper} Vocabulary"),
+                            "version": cfg.get("model_version", "1.0.0"),
+                            "source": cfg.get("grammar_structure", "Standard"),
+                            "total_core": len(signs),
+                            "total_plugins": 0,
+                            "language": lang_upper,
+                        },
+                        "total": len(signs),
+                        "signs": signs,
+                        "vocabulary": signs,
+                        "alphabet": cfg.get("alphabet", [])
+                    }
+                except Exception as e:
+                    logger.error(f"Failed to read {lang_upper} vocabulary: {e}")
+
         signs = []
         metadata = {
             "name": "ISL Core Vocabulary",
             "version": "1.0.0",
             "source": "Indian Sign Language Research and Training Centre (ISLRTC) Standard",
             "total_core": 0,
-            "total_plugins": 0
+            "total_plugins": 0,
+            "language": "ISL",
         }
 
         if self.vocab_path.exists():

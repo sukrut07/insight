@@ -474,12 +474,12 @@ export const GestureLab: React.FC = () => {
               <div className="space-y-1 pt-1">
                 <div className="flex justify-between text-xs font-bold font-mono">
                   <span>Confidence:</span>
-                  <span>{(confidence * 100).toFixed(1)}%</span>
+                  <span>{currentLabel !== 'NONE' ? `${(confidence * 100).toFixed(1)}%` : '0.0%'}</span>
                 </div>
                 <div className="w-full h-3 bg-white border-2 border-charcoal rounded-full overflow-hidden p-0.5">
                   <div
                     className="h-full bg-charcoal rounded-full transition-all duration-200"
-                    style={{ width: `${Math.min(100, Math.max(0, confidence * 100))}%` }}
+                    style={{ width: `${currentLabel !== 'NONE' ? Math.min(100, Math.max(0, confidence * 100)) : 0}%` }}
                   />
                 </div>
               </div>

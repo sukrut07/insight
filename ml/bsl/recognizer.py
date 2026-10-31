@@ -55,12 +55,12 @@ class BSLRecognizer(SignLanguageRecognizer):
                 "language": "BSL",
                 "label": "NONE",
                 "raw_label": "NONE",
-                "confidence": 1.0,
+                "confidence": 0.0,
                 "is_stable": False,
                 "recognition_type": "none",
                 "hands_detected": 0,
                 "new_word_emitted": None,
-                "status": "waiting",
+                "status": "model_pending",
                 "model_version": self.config.get("model_version", "bsl_v1_active"),
             }
 
@@ -114,9 +114,12 @@ class BSLRecognizer(SignLanguageRecognizer):
     def get_model_metadata(self) -> Dict[str, Any]:
         return {
             "language": "BSL",
-            "status": "active",
+            "status": "experimental",
             "model_version": self.config.get("model_version", "bsl_v1_active"),
-            "primary_architecture": "Kinematic Spatial-Temporal Classifier & Two-Hand Transformer",
+            "primary_architecture": "PoseFormer Spatial-Temporal Transformer (SignON Project)",
+            "candidate_evaluations": [
+                "signon-project/slr-poseformer-bsl"
+            ],
             "vocabulary_count": self.num_classes,
             "alphabet_count": len(self.alphabet),
         }

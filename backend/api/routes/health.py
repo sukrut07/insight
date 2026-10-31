@@ -2,6 +2,7 @@
 import json
 import time
 from pathlib import Path
+from typing import Optional
 from fastapi import APIRouter
 try:
     import torch
@@ -67,8 +68,8 @@ class ExtendVocabularyRequest(BaseModel):
 
 
 @router.get("/vocabulary")
-async def get_vocabulary():
-    data = vocabulary_service.get_all_vocabulary()
+async def get_vocabulary(language: Optional[str] = "ISL"):
+    data = vocabulary_service.get_all_vocabulary(language=language or "ISL")
     return data
 
 

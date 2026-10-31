@@ -55,12 +55,12 @@ class ASLRecognizer(SignLanguageRecognizer):
                 "language": "ASL",
                 "label": "NONE",
                 "raw_label": "NONE",
-                "confidence": 1.0,
+                "confidence": 0.0,
                 "is_stable": False,
                 "recognition_type": "none",
                 "hands_detected": 0,
                 "new_word_emitted": None,
-                "status": "waiting",
+                "status": "model_pending",
                 "model_version": self.config.get("model_version", "asl_v1_active"),
             }
 

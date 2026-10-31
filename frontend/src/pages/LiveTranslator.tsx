@@ -351,13 +351,18 @@ export const LiveTranslator: React.FC = () => {
           {/* Quick Verified Signs Cheat Sheet */}
           <div className="glass-panel p-3.5 rounded-xl border border-slate-800 text-xs">
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-              Supported ISLRTC Sign Vocabulary:
+              Supported {activeLanguage} Sign Vocabulary:
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {[
-                'HELLO', 'GOODBYE', 'THANK_YOU', 'PLEASE', 'SORRY', 'HELP',
-                'YES', 'NO', 'WATER', 'FOOD', 'I', 'YOU', 'MY', 'WHAT', 'WHERE'
-              ].map((v) => (
+              {(activeLanguage === 'BSL'
+                ? ['HELLO', 'GOODBYE', 'THANK_YOU', 'PLEASE', 'HELP', 'NAME', 'YES', 'NO']
+                : activeLanguage === 'ASL'
+                ? ['HELLO', 'THANK_YOU', 'PLEASE', 'HELP', 'YES', 'NO', 'WANT', 'NEED']
+                : [
+                    'HELLO', 'GOODBYE', 'THANK_YOU', 'PLEASE', 'SORRY', 'HELP',
+                    'YES', 'NO', 'WATER', 'FOOD', 'I', 'YOU', 'MY', 'WHAT', 'WHERE'
+                  ]
+              ).map((v) => (
                 <span
                   key={v}
                   className={`px-2 py-0.5 rounded text-[11px] font-mono border ${
@@ -404,7 +409,7 @@ export const LiveTranslator: React.FC = () => {
               </div>
               <div className="text-right">
                 <div className="text-xs font-mono font-bold text-slate-200">
-                  {Math.round(confidence * 100)}%
+                  {currentLabel !== 'NONE' ? `${Math.round(confidence * 100)}%` : '0%'}
                 </div>
                 <div className="text-[10px] text-slate-500">Confidence</div>
               </div>
