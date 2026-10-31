@@ -5,22 +5,38 @@ import { RecognitionMessage } from '../types';
 export function useRecognitionWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
+  const reconnectAttemptRef = useRef<number>(0);
+  const sessionIdRef = useRef<string>(
+    typeof window !== 'undefined'
+      ? window.sessionStorage.getItem('insight_session_id') ||
+        (() => {
+          const id = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+          window.sessionStorage.setItem('insight_session_id', id);
+          return id;
+        })()
+      : 'sess_default'
+  );
 
   const {
     isPaused,
     addToken,
+    activeLanguage,
   } = useStore();
 
   const connect = useCallback(() => {
-    // Protocol matches page (ws: or wss:)
+    if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/recognition`;
+    const wsUrl = `${protocol}//${window.location.host}/ws/recognition?session_id=${sessionIdRef.current}&language=${activeLanguage}`;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log('[WebSocket] Connected to /ws/recognition');
+      console.log(`[WebSocket] Connected: session=${sessionIdRef.current}, lang=${activeLanguage}`);
+      reconnectAttemptRef.current = 0;
     };
 
     ws.onmessage = (event) => {
@@ -50,24 +66,62 @@ export function useRecognitionWebSocket() {
       }
     };
 
-    ws.onclose = () => {
-      console.log('[WebSocket] Disconnected. Reconnecting in 2s...');
-      reconnectTimeoutRef.current = window.setTimeout(connect, 2000);
+    ws.onclose = (event) => {
+      if (event.wasClean) {
+        console.log('[WebSocket] Connection closed cleanly.');
+      } else {
+        reconnectAttemptRef.current += 1;
+        // Exponential backoff with jitter, capped at 10s
+        const backoffDelay = Math.min(
+          1000 * Math.pow(1.5, reconnectAttemptRef.current),
+          10000
+        );
+        console.log(`[WebSocket] Disconnected. Reconnecting in ${Math.round(backoffDelay)}ms (attempt ${reconnectAttemptRef.current})...`);
+        reconnectTimeoutRef.current = window.setTimeout(connect, backoffDelay);
+      }
     };
 
     ws.onerror = (err) => {
       console.error('[WebSocket] Error:', err);
       ws.close();
     };
-  }, [addToken, isPaused]);
+  }, [addToken, isPaused, activeLanguage]);
 
+  // Initial connection and tab visibility handling
   useEffect(() => {
     connect();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
+          connect();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      if (wsRef.current) wsRef.current.close();
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
   }, [connect]);
+
+  // Sync language changes dynamically over the existing socket
+  useEffect(() => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: 'set_language',
+          language: activeLanguage,
+        })
+      );
+    }
+  }, [activeLanguage]);
 
   const sendFrame = useCallback((base64Image: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -87,5 +141,5 @@ export function useRecognitionWebSocket() {
     }
   }, []);
 
-  return { sendFrame, resetBuffer };
+  return { sendFrame, resetBuffer, sessionId: sessionIdRef.current };
 }

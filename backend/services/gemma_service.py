@@ -20,6 +20,7 @@ import httpx
 
 from backend.config import settings
 from backend.services.feedback_service import feedback_service
+from backend.services.gemma_orchestrator import GestureVerification
 
 logger = logging.getLogger(__name__)
 
@@ -418,23 +419,24 @@ class GemmaService:
         is_consistent = not discrepancy and (confidence >= 0.50)
         confidence_assessment = "high" if confidence > 0.85 else ("moderate" if confidence > 0.60 else "low")
 
-        return {
-            "is_consistent": is_consistent,
-            "confidence_assessment": confidence_assessment,
-            "visual_observations": (
+        verified_obj = GestureVerification(
+            is_consistent=is_consistent,
+            confidence_assessment=confidence_assessment,
+            visual_observations=(
                 f"MediaPipe tracked {hands_detected} hand(s) (Right: {right_hand_present}, Left: {left_hand_present}). "
                 f"Spatial landmark positions correspond to ISL '{predicted_label}' movement vector."
             ),
-            "discrepancy_detected": discrepancy,
-            "discrepancy_details": discrepancy_details,
-            "suggested_alternatives": alternatives,
-            "explanation": (
+            discrepancy_detected=discrepancy,
+            discrepancy_details=discrepancy_details,
+            suggested_alternatives=alternatives,
+            explanation=(
                 f"Geometric landmark alignment supports classifier prediction '{predicted_label}' "
                 f"with {confidence * 100:.1f}% confidence." if is_consistent else
                 f"Discrepancy detected between hand count ({hands_detected}) and expected sign requirements."
             ),
-            "flag_for_review": discrepancy or (confidence < 0.60)
-        }
+            flag_for_review=discrepancy or (confidence < 0.60)
+        )
+        return verified_obj.dict()
 
     async def refine_translation(
         self, recognized_signs: List[Dict[str, Any]], custom_instruction: Optional[str] = None

@@ -13,10 +13,41 @@ import time
 from typing import Dict, Any, List, Optional
 import httpx
 
+from pydantic import BaseModel, Field
 from backend.config import settings
 from backend.services.language_router import language_router
 
 logger = logging.getLogger(__name__)
+
+
+class GestureVerification(BaseModel):
+    """Pydantic schema strictly validating Gemma visual consistency inspection."""
+    is_consistent: bool = True
+    confidence_assessment: str = "moderate"
+    visual_observations: str = ""
+    discrepancy_detected: bool = False
+    discrepancy_details: Optional[str] = None
+    suggested_alternatives: List[str] = Field(default_factory=list)
+    explanation: Optional[str] = None
+    flag_for_review: bool = False
+
+
+class GemmaTranslationResponse(BaseModel):
+    """Pydantic schema strictly validating Gemma translation & orchestration output."""
+    language: str = "ISL"
+    recognized_sequence: List[str] = Field(default_factory=list)
+    readable_translation: str = ""
+    confidence: float = 0.0
+    ambiguities: List[str] = Field(default_factory=list)
+    suggestions: List[str] = Field(default_factory=list)
+    requires_user_confirmation: bool = False
+    grammar_notes: str = ""
+    inferred_elements: List[str] = Field(default_factory=list)
+    provider: str = "local_ollama"
+    model: str = "gemma4:e4b"
+    verification_status: str = "VERIFIED"
+    latency_ms: Optional[float] = None
+
 
 # System prompt template tailored for Gemma 4 E4B local orchestration
 ORCHESTRATOR_SYSTEM_PROMPT = """You are Google Gemma 4 E4B, the Central Multilingual Sign Language Intelligence Orchestrator for SignBridge 2.0.
@@ -181,15 +212,22 @@ class GemmaOrchestrator:
                     content = data.get("message", {}).get("content", "").strip()
                     parsed = self._extract_json(content)
                     if parsed:
-                        parsed["provider"] = "local_ollama"
-                        parsed["model"] = self.primary_model
-                        parsed["latency_ms"] = round((time.perf_counter() - start_time) * 1000, 1)
-                        # Validate structure
-                        if "language" not in parsed:
-                            parsed["language"] = language
-                        if "recognized_sequence" not in parsed:
-                            parsed["recognized_sequence"] = tokens
-                        return parsed
+                        validated = GemmaTranslationResponse(
+                            language=parsed.get("language", language),
+                            recognized_sequence=parsed.get("recognized_sequence", tokens),
+                            readable_translation=parsed.get("readable_translation", ""),
+                            confidence=float(parsed.get("confidence", avg_conf)),
+                            ambiguities=parsed.get("ambiguities", []),
+                            suggestions=parsed.get("suggestions", []),
+                            requires_user_confirmation=bool(parsed.get("requires_user_confirmation", False)),
+                            grammar_notes=parsed.get("grammar_notes", ""),
+                            inferred_elements=parsed.get("inferred_elements", []),
+                            provider="local_ollama",
+                            model=self.primary_model,
+                            verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
+                            latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
+                        )
+                        return validated.dict()
             except Exception as e:
                 logger.warning("Ollama primary model %s error: %s. Trying fallback %s...", self.primary_model, e, self.fallback_model)
 
@@ -202,12 +240,56 @@ class GemmaOrchestrator:
                     content = data.get("message", {}).get("content", "").strip()
                     parsed = self._extract_json(content)
                     if parsed:
-                        parsed["provider"] = "local_ollama"
-                        parsed["model"] = self.fallback_model
-                        parsed["latency_ms"] = round((time.perf_counter() - start_time) * 1000, 1)
-                        return parsed
+                        validated = GemmaTranslationResponse(
+                            language=parsed.get("language", language),
+                            recognized_sequence=parsed.get("recognized_sequence", tokens),
+                            readable_translation=parsed.get("readable_translation", ""),
+                            confidence=float(parsed.get("confidence", avg_conf)),
+                            ambiguities=parsed.get("ambiguities", []),
+                            suggestions=parsed.get("suggestions", []),
+                            requires_user_confirmation=bool(parsed.get("requires_user_confirmation", False)),
+                            grammar_notes=parsed.get("grammar_notes", ""),
+                            inferred_elements=parsed.get("inferred_elements", []),
+                            provider="local_ollama",
+                            model=self.fallback_model,
+                            verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
+                            latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
+                        )
+                        return validated.dict()
             except Exception as e_fallback:
                 logger.error("Both Gemma models failed on Ollama: %s", e_fallback)
+
+            # Optional Hosted Gemini API fallback if explicitly configured & consented
+            if settings.CLOUD_CONSENT_GRANTED and settings.GEMINI_API_KEY:
+                try:
+                    gemini_url = f"{settings.GEMINI_API_BASE_URL.rstrip('/')}/v1beta/models/{settings.GEMINI_GEMMA_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"
+                    gemini_payload = {
+                        "contents": [{"parts": [{"text": f"{ORCHESTRATOR_SYSTEM_PROMPT}\n\n{user_message_content}"}]}]
+                    }
+                    g_resp = await client.post(gemini_url, json=gemini_payload, timeout=12.0)
+                    if g_resp.status_code == 200:
+                        g_data = g_resp.json()
+                        raw_text = g_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                        parsed = self._extract_json(raw_text)
+                        if parsed:
+                            validated = GemmaTranslationResponse(
+                                language=parsed.get("language", language),
+                                recognized_sequence=parsed.get("recognized_sequence", tokens),
+                                readable_translation=parsed.get("readable_translation", ""),
+                                confidence=float(parsed.get("confidence", avg_conf)),
+                                ambiguities=parsed.get("ambiguities", []),
+                                suggestions=parsed.get("suggestions", []),
+                                requires_user_confirmation=bool(parsed.get("requires_user_confirmation", False)),
+                                grammar_notes=parsed.get("grammar_notes", ""),
+                                inferred_elements=parsed.get("inferred_elements", []),
+                                provider="hosted_gemini",
+                                model=settings.GEMINI_GEMMA_MODEL,
+                                verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
+                                latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
+                            )
+                            return validated.dict()
+                except Exception as e_gemini:
+                    logger.error("Hosted Gemini API fallback failed: %s", e_gemini)
 
         return None
 
@@ -274,18 +356,21 @@ class GemmaOrchestrator:
         if avg_conf < 0.65:
             ambiguities.append("Lower classifier confidence. Verification advised.")
 
-        return {
-            "language": language,
-            "recognized_sequence": tokens,
-            "readable_translation": readable,
-            "confidence": round(avg_conf, 3),
-            "ambiguities": ambiguities,
-            "suggestions": [],
-            "requires_user_confirmation": avg_conf < 0.60,
-            "grammar_notes": f"Reconstructed using local {language} linguistic grammar rules (Ollama offline).",
-            "provider": "local_rule_fallback",
-            "model": "deterministic_v1"
-        }
+        fallback_resp = GemmaTranslationResponse(
+            language=language,
+            recognized_sequence=tokens,
+            readable_translation=readable,
+            confidence=round(avg_conf, 3),
+            ambiguities=ambiguities,
+            suggestions=[],
+            requires_user_confirmation=avg_conf < 0.60,
+            grammar_notes=f"Reconstructed using deterministic {language} linguistic grammar rules (Ollama offline).",
+            provider="local_rule_fallback",
+            model="deterministic_v1",
+            verification_status="PENDING_VERIFICATION" if avg_conf >= 0.60 else "DISPUTED",
+            latency_ms=0.0
+        )
+        return fallback_resp.dict()
 
 
 # Global singleton orchestrator

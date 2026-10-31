@@ -126,6 +126,13 @@ class TemporalGestureClassifier:
         if sequence_30x148.ndim == 2:
             sequence_30x148 = np.expand_dims(sequence_30x148, axis=0)
 
+        expected_dim = self.model.rnn.input_size
+        if sequence_30x148.shape[-1] != expected_dim:
+            raise ValueError(
+                f"Feature dimension mismatch in temporal model: expected input_dim={expected_dim}, "
+                f"got {sequence_30x148.shape[-1]}. Silent truncation or padding is forbidden."
+            )
+
         self.model.eval()
         with torch.no_grad():
             tensor_in = torch.tensor(sequence_30x148, dtype=torch.float32).to(self.device)
@@ -140,7 +147,11 @@ class TemporalGestureClassifier:
         path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({
             "model_state_dict": self.model.state_dict(),
-            "num_classes": self.num_classes
+            "num_classes": self.num_classes,
+            "input_dim": self.model.rnn.input_size,
+            "feature_schema_version": "1.0.0",
+            "model_name": "ISL_Temporal_BiLSTM",
+            "model_version": "1.0.0"
         }, path)
 
     def load(self, filepath: str):
@@ -149,5 +160,11 @@ class TemporalGestureClassifier:
             raise FileNotFoundError(f"Temporal model checkpoint not found: {path}")
         checkpoint = torch.load(path, map_location=self.device)
         self.num_classes = checkpoint.get("num_classes", self.num_classes)
+        expected_dim = checkpoint.get("input_dim", 148)
+        if expected_dim != self.model.rnn.input_size:
+            raise ValueError(
+                f"Incompatible checkpoint: checkpoint expects input_dim={expected_dim}, "
+                f"but model initialized with {self.model.rnn.input_size}"
+            )
         self.model.load_state_dict(checkpoint["model_state_dict"])
         self.model.eval()

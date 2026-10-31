@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     # Optional Hosted Gemini API Rapid Prototyping Mode (Explicit Opt-In)
     GEMINI_API_KEY: str = ""
+    GEMINI_API_BASE_URL: str = "https://generativelanguage.googleapis.com"
     GEMINI_GEMMA_MODEL: str = "gemma-4-31b-it"
     GEMINI_FALLBACK_MODEL: str = "gemma-4-26b-a4b-it"
     CLOUD_CONSENT_GRANTED: bool = False

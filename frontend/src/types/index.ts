@@ -11,6 +11,10 @@ export interface DetectedHand {
 
 export interface RecognitionMessage {
   type: 'recognition_result';
+  session_id?: string;
+  language?: string;
+  status?: string;
+  state?: string;
   hands_detected: number;
   left_hand: boolean;
   right_hand: boolean;
@@ -19,6 +23,8 @@ export interface RecognitionMessage {
   confidence: number;
   is_stable: boolean;
   new_word_emitted: string | null;
+  sentence_boundary?: boolean;
+  non_manual_markers?: string[];
   landmarks: DetectedHand[];
   annotated_frame: string;
   fps: number;
@@ -243,8 +249,10 @@ export interface AccessibilitySettings {
 export type ActiveTab =
   | 'home'
   | 'gesture-lab'
+  | 'connect'
   | 'learn'
   | 'dictionary'
+  | 'research'
   | 'about'
   | 'settings'
   // Backward-compatible aliases

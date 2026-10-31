@@ -62,7 +62,7 @@ $L_i = (x_i, y_i, z_i)$ for $i \in [0, 20]$.
 - **Model Architecture**:
   ```python
   class TemporalGestureRNN(nn.Module):
-      def __init__(self, input_size=126, hidden_size=128, num_layers=2, num_classes=15):
+      def __init__(self, input_size=148, hidden_size=128, num_layers=2, num_classes=15):
           super().__init__()
           self.lstm = nn.LSTM(input_size, hidden_size, num_layers, 
                               batch_first=True, dropout=0.2, bidirectional=True)
@@ -73,6 +73,14 @@ $L_i = (x_i, y_i, z_i)$ for $i \in [0, 20]$.
               nn.Linear(64, num_classes)
           )
   ```
+- **Canonical Feature Schema (148 dimensions)**:
+  - Left hand normalized coordinates (21 landmarks $\times$ 3): 63
+  - Right hand normalized coordinates (21 landmarks $\times$ 3): 63
+  - Left hand finger joint angles (PIP & DIP): 10
+  - Right hand finger joint angles (PIP & DIP): 10
+  - Left hand detection presence flag: 1
+  - Right hand detection presence flag: 1
+  - **Total**: $63 + 63 + 10 + 10 + 1 + 1 = 148$ features per frame.
 - **Target ISL Vocabulary**:
   - `HELLO`, `GOODBYE`, `THANK_YOU`, `HELP`, `PLEASE`, `SORRY`.
 - **Temporal Output Smoothing**:

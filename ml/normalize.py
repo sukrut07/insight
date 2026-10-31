@@ -168,7 +168,8 @@ def process_dual_hand_landmarks(
     metadata = {
         "hand_count": int(left_present + right_present),
         "left_detected": bool(left_present),
-        "right_detected": bool(right_present)
+        "right_detected": bool(right_present),
+        "raw_coords_126": raw_coords_126
     }
 
     return raw_coords_126, engineered_features, metadata
