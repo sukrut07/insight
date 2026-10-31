@@ -73,30 +73,18 @@ class GestureService:
             return formatted
 
         elif active_lang in ["BSL", "ASL"]:
-            # Dedicated pipeline is in experimental/training phase
-            cfg = language_router.get_language_config(active_lang) or {}
-            hands_count = len(detected_hands)
+            from ml.model_registry import model_registry
+            recognizer = model_registry.get_recognizer(active_lang)
+            res = recognizer.predict_frame(detected_hands)
             has_left = any(h.get("handedness") == "Left" for h in detected_hands)
             has_right = any(h.get("handedness") == "Right" for h in detected_hands)
-
-            return {
-                "language": active_lang,
-                "label": "NONE",
-                "raw_label": "NONE",
-                "confidence": 0.0,
-                "model_version": cfg.get("model_version", "prototype"),
-                "recognition_type": "none",
-                "status": "model_pending",
-                "state": "model_pending",
-                "is_stable": False,
-                "new_word_emitted": None,
-                "hands_detected": hands_count,
+            res.update({
                 "left_hand": has_left,
                 "right_hand": has_right,
                 "sentence_boundary": False,
                 "non_manual_markers": [],
-                "message": f"{cfg.get('name', active_lang)} classifier is currently in experimental / training phase. Sign reference and visual practice are active."
-            }
+            })
+            return res
 
         # Fallback
         return {

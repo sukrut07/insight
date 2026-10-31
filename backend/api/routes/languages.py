@@ -18,6 +18,13 @@ async def list_languages():
     return language_router.get_supported_languages()
 
 
+@router.get("/models")
+async def list_registered_models():
+    """Returns registered recognizers, architectures, and candidate evaluations."""
+    from ml.model_registry import model_registry
+    return model_registry.list_models()
+
+
 @router.get("/active")
 async def get_active_language():
     """Returns currently selected sign language."""

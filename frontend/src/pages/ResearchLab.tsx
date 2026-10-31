@@ -361,6 +361,132 @@ export const ResearchLab: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Section 5: Hugging Face Pretrained Candidates & Model Registry */}
+        <div className="bg-white border-2 border-[#242424] rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_#242424]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-6 border-b-2 border-[#242424] gap-3">
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-[#242424] flex items-center gap-2">
+                <Layers className="w-5 h-5 text-[#242424]" />
+                Hugging Face Pretrained Model Candidates & Model Registry
+              </h2>
+              <p className="text-xs font-semibold text-[#666] mt-0.5">
+                Language-specific model ensemble candidates audited for vocabulary scope, checkpoint format, and licensing.
+              </p>
+            </div>
+            <a
+              href="https://huggingface.co/models?pipeline_tag=video-classification&search=sign+language"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F8F6EF] border-2 border-[#242424] rounded-xl text-xs font-black shadow-[2px_2px_0px_#242424] hover:bg-[#F9E9B7] transition"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> View on Hugging Face
+            </a>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-[#F8F6EF] border-b-2 border-[#242424]">
+                  <th className="p-3 font-black text-[#242424]">Hugging Face Candidate</th>
+                  <th className="p-3 font-black text-[#242424]">Lang</th>
+                  <th className="p-3 font-black text-[#242424]">Task / Granularity</th>
+                  <th className="p-3 font-black text-[#242424]">Architecture</th>
+                  <th className="p-3 font-black text-[#242424]">Input Modality</th>
+                  <th className="p-3 font-black text-[#242424]">License</th>
+                  <th className="p-3 font-black text-[#242424]">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y border-b border-[#242424] font-medium text-[#333]">
+                {[
+                  {
+                    id: 'Abs6187/isl-models',
+                    lang: 'ISL',
+                    task: 'Dynamic Vocabulary (80+ signs)',
+                    arch: 'Hierarchical Two-Stream Transformer',
+                    input: '154-dim Pose/Hand Keypoints',
+                    license: 'MIT',
+                    status: 'Primary Candidate',
+                    statusBg: '#CDEFD4',
+                  },
+                  {
+                    id: 'ayush2635/sanket-isl-translator',
+                    lang: 'ISL',
+                    task: 'Continuous Video-to-Text',
+                    arch: 'TimeSformer Dual-stream',
+                    input: '16-frame RGB (224x224)',
+                    license: 'Apache-2.0',
+                    status: 'Path B Benchmark',
+                    statusBg: '#C8E9F7',
+                  },
+                  {
+                    id: 'kirandevraj/ISL-Fingerspelling',
+                    lang: 'ISL',
+                    task: 'Fingerspelling (CTC A-Z)',
+                    arch: 'ResNet-18 + BiLSTM + CTC',
+                    input: 'RGB Frame Stream',
+                    license: 'CC-BY-NC-4.0',
+                    status: 'Spelling Specialist',
+                    statusBg: '#F9E9B7',
+                  },
+                  {
+                    id: 'SharoonArshad/asl-citizen-bigru-attention-encoder-200',
+                    lang: 'ASL',
+                    task: 'Dynamic Signs (200 words)',
+                    arch: 'BiGRU + Additive Attention',
+                    input: '30-frame Keypoint Sequence',
+                    license: 'CC-BY-NC-SA 4.0',
+                    status: 'Primary Candidate',
+                    statusBg: '#CDEFD4',
+                  },
+                  {
+                    id: 'abdollahhh/asl-sign-language-efficientnet-b0',
+                    lang: 'ASL',
+                    task: 'Alphabet (26 classes)',
+                    arch: 'EfficientNet-B0 (4M params)',
+                    input: 'Single RGB Frame (224x224)',
+                    license: 'Apache-2.0',
+                    status: 'Fast Alphabet',
+                    statusBg: '#E8DDFB',
+                  },
+                  {
+                    id: 'signon-project/slr-poseformer-bsl',
+                    lang: 'BSL',
+                    task: 'Keypoint Sign Recognition',
+                    arch: 'PoseFormer (Spatial-Temporal)',
+                    input: '3D Skeletal Keypoints',
+                    license: 'EU Horizon / Open',
+                    status: 'Primary Candidate',
+                    statusBg: '#CDEFD4',
+                  },
+                ].map((row, idx) => (
+                  <tr key={idx} className="hover:bg-[#F8F6EF]/60 transition">
+                    <td className="p-3 font-black text-[#242424] font-mono text-[11px]">
+                      {row.id}
+                    </td>
+                    <td className="p-3">
+                      <span className="px-2 py-0.5 bg-[#F8F6EF] border border-[#242424] rounded-md font-black text-[10px]">
+                        {row.lang}
+                      </span>
+                    </td>
+                    <td className="p-3 font-semibold">{row.task}</td>
+                    <td className="p-3">{row.arch}</td>
+                    <td className="p-3 text-[11px] text-[#555]">{row.input}</td>
+                    <td className="p-3 font-mono text-[11px]">{row.license}</td>
+                    <td className="p-3">
+                      <span
+                        className="px-2.5 py-0.5 border border-[#242424] rounded-full text-[10px] font-black shadow-[1px_1px_0px_#242424]"
+                        style={{ backgroundColor: row.statusBg }}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
