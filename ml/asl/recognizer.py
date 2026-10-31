@@ -114,9 +114,9 @@ class ASLRecognizer(SignLanguageRecognizer):
     def get_model_metadata(self) -> Dict[str, Any]:
         return {
             "language": "ASL",
-            "status": "active",
+            "status": "experimental",
             "model_version": self.config.get("model_version", "asl_v1_active"),
-            "primary_architecture": "Kinematic Spatial-Temporal Classifier & ASL-Citizen derived BiGRU",
+            "primary_architecture": "BiGRU with Attention Pooling (ASL-Citizen derived)",
             "vocabulary_count": self.num_classes,
             "alphabet_count": len(self.alphabet),
         }
