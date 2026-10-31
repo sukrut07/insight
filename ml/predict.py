@@ -55,8 +55,14 @@ class GesturePredictor:
 
         lstm_path = MODELS_DIR / "temporal_lstm.pt"
         if lstm_path.exists():
-            self.temporal_clf = TemporalGestureClassifier(num_classes=self.num_classes)
-            self.temporal_clf.load(str(lstm_path))
+            try:
+                self.temporal_clf = TemporalGestureClassifier(num_classes=self.num_classes)
+                if getattr(self.temporal_clf, "model", None) is not None:
+                    self.temporal_clf.load(str(lstm_path))
+                else:
+                    self.temporal_clf = None
+            except Exception:
+                self.temporal_clf = None
 
     def process_frame(
         self, detected_hands: List[Dict[str, Any]]

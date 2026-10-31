@@ -2,11 +2,19 @@
 from pathlib import Path
 from typing import Tuple, Optional
 import numpy as np
-import torch
-import torch.nn as nn
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+    _BaseModule = nn.Module
+except Exception:
+    TORCH_AVAILABLE = False
+    torch = None
+    nn = None
+    _BaseModule = object
 
 
-class TemporalGestureRNN(nn.Module):
+class TemporalGestureRNN(_BaseModule):
     """Bidirectional LSTM with Attention-pooling for dynamic ISL gesture sequences."""
 
     def __init__(
@@ -82,8 +90,13 @@ class TemporalGestureClassifier:
         rnn_type: str = "lstm",
     ):
         self.num_classes = num_classes
+        if not TORCH_AVAILABLE:
+            self.device = None
+            self.model = None
+            return
+
         self.device = torch.device(
-            "mps" if torch.backends.mps.is_available() else "cpu"
+            "mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu"
         )
         self.model = TemporalGestureRNN(
             input_dim=input_dim,

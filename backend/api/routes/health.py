@@ -3,7 +3,13 @@ import json
 import time
 from pathlib import Path
 from fastapi import APIRouter
-import torch
+try:
+    import torch
+    HAS_TORCH = True
+    HAS_MPS = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
+except Exception:
+    HAS_TORCH = False
+    HAS_MPS = False
 
 from backend.config import settings
 from backend.services.gemma_service import gemma_service
@@ -15,7 +21,7 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 async def get_health():
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
+    device = "mps" if HAS_MPS else "cpu"
     return {
         "status": "healthy",
         "app_name": settings.APP_NAME,
@@ -43,7 +49,7 @@ async def get_model_status():
         "gemini_api_configured": bool(settings.GEMINI_API_KEY.strip()),
         "cloud_consent_granted": settings.CLOUD_CONSENT_GRANTED,
         "active_provider": orchestrator_status["active_provider"],
-        "mps_gpu_acceleration": torch.backends.mps.is_available()
+        "mps_gpu_acceleration": HAS_MPS
     }
 
 

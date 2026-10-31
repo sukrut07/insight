@@ -8,19 +8,13 @@ python-dotenv>=1.0.0
 httpx>=0.27.0
 websockets>=12.0
 
-# Scientific & Machine Learning
+# Scientific & Machine Learning (Headless & Lean for Cloud Serverless)
 numpy>=1.24.0,<2.0.0
 scikit-learn>=1.4.0
-scipy>=1.12.0
 joblib>=1.3.0
-torch>=2.2.0
 pillow>=10.2.0
 opencv-python-headless>=4.9.0.80
 mediapipe>=0.10.9
 
 # AI & Multimodal Providers
 ollama>=0.1.7
-
-# Testing
-pytest>=8.0.0
-pytest-asyncio>=0.23.0
