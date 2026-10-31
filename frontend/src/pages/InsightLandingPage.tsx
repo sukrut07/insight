@@ -63,12 +63,12 @@ export const InsightLandingPage: React.FC = () => {
             className="lg:col-span-7 space-y-8"
           >
             {/* Top Pill Tags */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="neo-pill bg-pastel-mint text-charcoal flex items-center space-x-1.5 shadow-hard-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="neo-pill bg-pastel-mint text-charcoal flex items-center gap-2 px-3.5 py-1.5 shadow-hard-xs text-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
                 <span className="font-bold">A New Way to Connect</span>
               </span>
-              <span className="neo-pill bg-pastel-yellow text-charcoal shadow-hard-xs">
+              <span className="neo-pill bg-pastel-yellow text-charcoal px-3.5 py-1.5 shadow-hard-xs text-xs font-bold">
                 Local On-Device AI • Gemma 4 E4B
               </span>
             </div>
