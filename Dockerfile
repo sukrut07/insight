@@ -1,14 +1,20 @@
+# syntax=docker/dockerfile:1
 # Multi-stage Docker build for iNSIGHT Production Showcase
+
 # Stage 1: Build React 18 Frontend
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
+
+# Install dependencies with frozen lockfile
 COPY frontend/package*.json ./
 RUN npm ci
+
+# Copy frontend source and build static bundle
 COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Python Backend Runtime
-FROM python:3.11-slim
+FROM python:3.11-slim AS runtime
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
@@ -27,10 +33,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Python requirements
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Create non-root application user for secure execution
-RUN useradd -m -u 1000 appuser && \
+RUN useradd -m -u 1000 -s /bin/bash appuser && \
     mkdir -p /app/data /app/models/huggingface && \
     chown -R appuser:appuser /app
 
@@ -49,7 +56,9 @@ USER appuser
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+# Health check using JSON exec syntax to avoid shell escaping issues
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD ["curl", "-f", "http://localhost:8000/api/health"]
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Dynamic port binding allowing cloud platforms (e.g. DigitalOcean) to inject $PORT
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
