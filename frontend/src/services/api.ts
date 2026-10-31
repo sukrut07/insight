@@ -10,7 +10,8 @@ import {
   DatasetSummary,
 } from '../types';
 
-const API_BASE = '/api';
+const envApiUrl = (import.meta as any).env?.VITE_API_URL;
+export const API_BASE = envApiUrl ? String(envApiUrl).replace(/\/$/, '') + '/api' : '/api';
 
 export async function fetchHealth() {
   const res = await fetch(`${API_BASE}/health`);

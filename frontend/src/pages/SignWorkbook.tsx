@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { SignLanguageId } from '../types';
+import { API_BASE } from '../services/api';
 import {
   BookOpen,
   Volume2,
@@ -59,7 +60,7 @@ export const SignWorkbook: React.FC = () => {
     const fetchLanguageData = async () => {
       setLoading(true);
       try {
-        const resp = await fetch(`/api/languages/${activeLanguage.toLowerCase()}/config`);
+        const resp = await fetch(`${API_BASE}/languages/${activeLanguage.toLowerCase()}/config`);
         if (resp.ok) {
           const data = await resp.json();
           setAlphabets(data.alphabet || []);

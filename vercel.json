@@ -19,6 +19,13 @@
       ]
     }
   },
+  "functions": {
+    "main.py": {
+      "memory": 1024,
+      "maxDuration": 30,
+      "excludeFiles": "{data/**,models/**,frontend/**,tests/**,docs/**,scripts/**,ollama/**,*.md,*.png,*.task,*.joblib,*.pt,*.npy,*.db,*.sqlite3,Dockerfile,docker-compose.yml}"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
