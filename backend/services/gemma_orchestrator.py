@@ -287,7 +287,7 @@ class GemmaOrchestrator:
                                 verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
                                 latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
                             )
-                            return validated.dict()
+                            return validated.model_dump()
                 except Exception as e_gemini:
                     logger.error("Hosted Gemini API fallback failed: %s", e_gemini)
 

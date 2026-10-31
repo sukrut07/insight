@@ -27,7 +27,9 @@ async def get_health():
 
 @router.get("/models/status")
 async def get_model_status():
+    from backend.services.model_orchestrator import model_orchestrator
     ollama_info = await gemma_service.check_availability()
+    orchestrator_status = await model_orchestrator.get_provider_status()
     return {
         "mediapipe_ready": settings.HAND_LANDMARKER_MODEL.exists(),
         "static_model_loaded": settings.STATIC_MODEL_PATH.exists(),
@@ -35,9 +37,12 @@ async def get_model_status():
         "ollama_available": ollama_info["ollama_online"],
         "primary_model_available": ollama_info["primary_available"],
         "fallback_model_available": ollama_info["fallback_available"],
-        "primary_model_name": settings.PRIMARY_LLM,
-        "fallback_model_name": settings.FALLBACK_LLM,
+        "primary_model_name": settings.OLLAMA_PRIMARY_MODEL or settings.PRIMARY_LLM,
+        "fallback_model_name": settings.OLLAMA_FALLBACK_MODEL or settings.FALLBACK_LLM,
         "installed_ollama_models": ollama_info["installed_models"],
+        "gemini_api_configured": bool(settings.GEMINI_API_KEY.strip()),
+        "cloud_consent_granted": settings.CLOUD_CONSENT_GRANTED,
+        "active_provider": orchestrator_status["active_provider"],
         "mps_gpu_acceleration": torch.backends.mps.is_available()
     }
 

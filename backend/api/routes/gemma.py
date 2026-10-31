@@ -45,6 +45,13 @@ async def get_gemma_evaluation():
     return GemmaEvaluationStats(**stats)
 
 
+@router.get("/providers")
+async def get_provider_status():
+    """Returns status and readiness across Gemini API, Ollama E4B, and Ollama E2B."""
+    from backend.services.model_orchestrator import model_orchestrator
+    return await model_orchestrator.get_provider_status()
+
+
 @router.post("/disagreement/action")
 async def handle_disagreement_action(payload: DisagreementActionRequest):
     """Resolves a visual/classifier disagreement through human-in-the-loop review."""
