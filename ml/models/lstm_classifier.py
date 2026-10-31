@@ -168,3 +168,17 @@ class TemporalGestureClassifier:
             )
         self.model.load_state_dict(checkpoint["model_state_dict"])
         self.model.eval()
+
+    @classmethod
+    def from_checkpoint(cls, filepath: str, device: str = "cpu"):
+        """Instantiates and loads TemporalGestureRNN directly from a saved checkpoint."""
+        path = Path(filepath)
+        if not path.exists():
+            raise FileNotFoundError(f"Temporal model checkpoint not found: {path}")
+        checkpoint = torch.load(path, map_location=device)
+        input_dim = checkpoint.get("input_dim", 148)
+        num_classes = checkpoint.get("num_classes", 15)
+        instance = cls(input_dim=input_dim, num_classes=num_classes)
+        instance.model.load_state_dict(checkpoint["model_state_dict"])
+        instance.model.eval()
+        return instance

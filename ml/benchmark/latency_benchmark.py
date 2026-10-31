@@ -5,7 +5,7 @@ from typing import Dict, Any
 import numpy as np
 
 from ml.feature_engineering import extract_features, validate_feature_vector
-from ml.models.lstm_classifier import TemporalGestureRNN
+from ml.models.lstm_classifier import TemporalGestureClassifier
 from backend.services.model_orchestrator import model_orchestrator, ModelRequest, TaskType
 from backend.services.recognition_state_machine import RecognitionStateMachine
 from backend.config import settings
@@ -19,7 +19,7 @@ async def run_latency_profile(iterations: int = 20) -> Dict[str, Any]:
     dummy_hand = {"landmarks": [{"x": 0.5, "y": 0.5, "z": 0.0} for _ in range(21)], "handedness": "Right"}
     for _ in range(iterations):
         t0 = time.perf_counter()
-        vec = extract_features([dummy_hand])
+        vec, *_ = extract_features([dummy_hand])
         validate_feature_vector(vec)
         t_feats.append((time.perf_counter() - t0) * 1000)
 
@@ -36,7 +36,7 @@ async def run_latency_profile(iterations: int = 20) -> Dict[str, Any]:
     # 3. BiLSTM Sequence Inference
     t_lstm = []
     if settings.TEMPORAL_MODEL_PATH.exists():
-        lstm_model = TemporalGestureRNN.load(str(settings.TEMPORAL_MODEL_PATH))
+        lstm_model = TemporalGestureClassifier.from_checkpoint(str(settings.TEMPORAL_MODEL_PATH))
         seq = np.zeros((30, 148), dtype=np.float32)
         for _ in range(iterations):
             t0 = time.perf_counter()
@@ -48,7 +48,7 @@ async def run_latency_profile(iterations: int = 20) -> Dict[str, Any]:
     sm = RecognitionStateMachine()
     for _ in range(iterations):
         t0 = time.perf_counter()
-        _ = sm.process_prediction("HELLO", 0.92, True)
+        _ = sm.update_frame(predicted_label="HELLO", confidence=0.92, is_hands_present=True)
         t_sm.append((time.perf_counter() - t0) * 1000)
 
     # 5. Deterministic Translation

@@ -533,6 +533,12 @@ class ModelOrchestrator:
         self.total_routed_tasks += 1
         provider_preference = preferred_provider or settings.DEFAULT_AI_PROVIDER or settings.DEFAULT_PROVIDER
 
+        # Direct explicit route if deterministic requested
+        if provider_preference == ProviderType.DETERMINISTIC.value:
+            det_resp = await self.deterministic.generate(request)
+            self.provider_usage[ProviderType.DETERMINISTIC.value] += 1
+            return det_resp
+
         # 1. Cloud Gemini Attempt (Only if preferred, configured, and consented)
         if provider_preference == ProviderType.GEMINI_API.value and settings.CLOUD_CONSENT_GRANTED:
             gemini_resp = await self.gemini.generate(request)
@@ -540,6 +546,17 @@ class ModelOrchestrator:
                 self.provider_usage[ProviderType.GEMINI_API.value] += 1
                 return gemini_resp
             logger.warning(f"Gemini API attempt failed: {gemini_resp.error_message}. Falling back to Ollama E4B...")
+
+        # Explicit route for E2B
+        if provider_preference == ProviderType.OLLAMA_E2B.value:
+            e2b_resp = await self.ollama_e2b.generate(request)
+            if e2b_resp.status == "success":
+                self.provider_usage[ProviderType.OLLAMA_E2B.value] += 1
+                return e2b_resp
+            logger.warning("Ollama E2B failed. Falling back to deterministic rules...")
+            det_resp = await self.deterministic.generate(request)
+            self.provider_usage[ProviderType.DETERMINISTIC.value] += 1
+            return det_resp
 
         # 2. Primary Local Model: Gemma 4 E4B
         e4b_resp = await self.ollama_e4b.generate(request)

@@ -9,7 +9,7 @@ import torch
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 
 from backend.config import PROJECT_ROOT, settings
-from ml.models.lstm_classifier import TemporalGestureRNN
+from ml.models.lstm_classifier import TemporalGestureClassifier
 
 
 def benchmark_static_model(
@@ -81,7 +81,7 @@ def benchmark_temporal_model(
         return {"status": "NOT EVALUATED", "error": "Model or test dataset missing"}
 
     t0 = time.perf_counter()
-    model = TemporalGestureRNN.load(str(model_path))
+    model = TemporalGestureClassifier.from_checkpoint(str(model_path))
     load_time_ms = (time.perf_counter() - t0) * 1000
     model_size_mb = os.path.getsize(model_path) / (1024 * 1024)
 
