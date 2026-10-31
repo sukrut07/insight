@@ -40,6 +40,9 @@ env/
 data/feedback/
 data/raw/
 *.npy
+models/huggingface/
+*.safetensors
+*.bin
 
 # Node / Frontend
 frontend/node_modules/
