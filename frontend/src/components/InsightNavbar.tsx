@@ -3,6 +3,8 @@ import { useStore } from '../store/useStore';
 import { ActiveTab, SignLanguageId } from '../types';
 import { ArrowUpRight, Menu, X, Sparkles } from 'lucide-react';
 import { SignLanguageSelector } from './SignLanguageSelector';
+import { InsightBrandLogo } from './InsightBrandLogo';
+
 
 export const InsightNavbar: React.FC = () => {
   const { activeTab, setActiveTab, activeLanguage } = useStore();
@@ -48,19 +50,9 @@ export const InsightNavbar: React.FC = () => {
         {/* Brand Logo */}
         <div
           onClick={() => handleNavClick('home')}
-          className="flex items-center space-x-2.5 cursor-pointer group select-none"
+          className="cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-xl bg-pastel-mint border-2 border-charcoal flex items-center justify-center shadow-hard-xs group-hover:-translate-y-0.5 group-hover:shadow-hard-sm transition-all">
-            <span className="text-lg">✌️</span>
-          </div>
-          <div className="flex items-baseline space-x-1.5">
-            <span className="text-2xl font-black font-display tracking-tight text-charcoal">
-              iNSIGHT
-            </span>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 bg-pastel-yellow border border-charcoal rounded-md">
-              AI
-            </span>
-          </div>
+          <InsightBrandLogo size="md" />
         </div>
 
         {/* Center Desktop Navigation Pills */}
