@@ -436,7 +436,7 @@ class GemmaService:
             ),
             flag_for_review=discrepancy or (confidence < 0.60)
         )
-        return verified_obj.dict()
+        return verified_obj.model_dump()
 
     async def refine_translation(
         self, recognized_signs: List[Dict[str, Any]], custom_instruction: Optional[str] = None

@@ -19,9 +19,12 @@ export const InsightNavbar: React.FC = () => {
 
   const navItems: { id: ActiveTab; label: string; href?: string }[] = [
     { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About' },
-    { id: 'learn', label: 'Languages & Learn' },
+    { id: 'gesture-lab', label: 'Gesture Lab' },
+    { id: 'connect', label: 'Connect' },
+    { id: 'learn', label: 'Learn' },
     { id: 'dictionary', label: 'Dictionary' },
+    { id: 'research', label: 'Research' },
+    { id: 'about', label: 'About' },
     { id: 'settings', label: 'Settings' },
   ];
 

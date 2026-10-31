@@ -9,6 +9,8 @@ import { SignLearningCentre } from './pages/SignLearningCentre';
 import { SignDictionary } from './pages/SignDictionary';
 import { AccessibilitySettingsPage } from './pages/AccessibilitySettingsPage';
 import { GemmaDashboard } from './pages/GemmaDashboard';
+import { ConnectPage } from './pages/ConnectPage';
+import { ResearchLab } from './pages/ResearchLab';
 import { TranslationEditor } from './pages/TranslationEditor';
 import { ModelStatus } from './pages/ModelStatus';
 import { DataCollection } from './pages/DataCollection';
@@ -33,6 +35,8 @@ export const App: React.FC = () => {
       <main className="flex-1">
         {isLanding && <InsightLandingPage />}
         {(activeTab === 'gesture-lab' || activeTab === 'translator') && <GestureLab />}
+        {activeTab === 'connect' && <ConnectPage />}
+        {activeTab === 'research' && <ResearchLab />}
         {activeTab === 'learn' && <SignLearningCentre />}
         {activeTab === 'dictionary' && <SignDictionary />}
         {activeTab === 'about' && <AboutPage />}

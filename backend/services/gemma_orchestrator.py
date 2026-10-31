@@ -227,7 +227,7 @@ class GemmaOrchestrator:
                             verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
                             latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
                         )
-                        return validated.dict()
+                        return validated.model_dump()
             except Exception as e:
                 logger.warning("Ollama primary model %s error: %s. Trying fallback %s...", self.primary_model, e, self.fallback_model)
 
@@ -255,7 +255,7 @@ class GemmaOrchestrator:
                             verification_status="VERIFIED" if not parsed.get("requires_user_confirmation") else "DISPUTED",
                             latency_ms=round((time.perf_counter() - start_time) * 1000, 1)
                         )
-                        return validated.dict()
+                        return validated.model_dump()
             except Exception as e_fallback:
                 logger.error("Both Gemma models failed on Ollama: %s", e_fallback)
 
@@ -370,7 +370,7 @@ class GemmaOrchestrator:
             verification_status="PENDING_VERIFICATION" if avg_conf >= 0.60 else "DISPUTED",
             latency_ms=0.0
         )
-        return fallback_resp.dict()
+        return fallback_resp.model_dump()
 
 
 # Global singleton orchestrator

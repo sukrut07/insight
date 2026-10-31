@@ -158,7 +158,7 @@ class RecognitionStateMachine:
             "candidate": self.current_candidate,
             "confidence": round(self.candidate_confidence, 3),
             "is_stable": is_stable,
-            "new_segment_emitted": new_segment.dict() if new_segment else None,
+            "new_segment_emitted": new_segment.model_dump() if new_segment else None,
             "sentence_boundary": False,
             "non_manual_markers": self.active_non_manual_markers,
         }
