@@ -38,9 +38,9 @@ class Settings(BaseSettings):
     # Google Gemini API Cloud Provider (Optional Cloud Reasoning / Multimodal Prototyping)
     GEMINI_API_KEY: str = ""
     GEMINI_API_BASE_URL: str = "https://generativelanguage.googleapis.com"
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
     GEMINI_GEMMA_MODEL: str = "gemma-4-31b-it"
-    GEMINI_FALLBACK_MODEL: str = "gemma-4-26b-a4b-it"
+    GEMINI_FALLBACK_MODEL: str = "gemini-3.8-flash"
     GEMINI_ENABLED: bool = False
     CLOUD_CONSENT_GRANTED: bool = False
 

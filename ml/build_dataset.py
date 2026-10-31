@@ -97,15 +97,22 @@ def generate_sign_trajectory(
     hands_count: int,
     signer_id: int,
     noise_level: float = 0.02,
+    augment: bool = False,
 ) -> np.ndarray:
     """Generates a 30-frame normalized feature sequence (30, 148) for an ISL sign."""
     seq_features = []
     # Kinematic trajectories
     t = np.linspace(0, 1, 30)
 
-    # Base signer anatomical offset
-    signer_x_offset = (signer_id - 1) * 0.04
-    signer_speed = 1.0 + (signer_id - 1) * 0.15
+    # Base signer anatomical offset with continuous augmentation support
+    if augment:
+        signer_x_offset = float(np.random.uniform(-0.10, 0.15))
+        signer_speed = float(np.random.uniform(0.80, 1.55))
+        pose_scale = float(np.random.uniform(0.12, 0.18))
+    else:
+        signer_x_offset = (signer_id - 1) * 0.04
+        signer_speed = 1.0 + (signer_id - 1) * 0.15
+        pose_scale = 0.15
 
     for frame_idx in range(30):
         progress = np.clip(t[frame_idx] * signer_speed, 0.0, 1.0)
@@ -116,7 +123,7 @@ def generate_sign_trajectory(
             wx = 0.65 + progress * 0.20 + signer_x_offset
             wy = 0.30 - np.sin(progress * np.pi) * 0.05
             wz = -0.1
-            r_lm = create_base_hand_pose("open", "Right", (wx, wy, wz))
+            r_lm = create_base_hand_pose("open", "Right", (wx, wy, wz), scale=pose_scale)
             detected_hands.append({"handedness": "Right", "landmarks": r_lm})
 
         elif label == "GOODBYE":
@@ -250,6 +257,8 @@ def build_and_save_dataset():
         temporal_y = []
         static_X = []
         static_y = []
+        is_train = (split_name == "train")
+        n_samples = 50 if is_train else 25
 
         for sign_info in vocab:
             label = sign_info["label"]
@@ -258,13 +267,14 @@ def build_and_save_dataset():
             hands = sign_info["hands"]
 
             for signer_id in signers:
-                for _ in range(samples_per_signer):
+                for _ in range(n_samples):
                     seq = generate_sign_trajectory(
                         label=label,
                         sign_type=sign_type,
                         hands_count=hands,
                         signer_id=signer_id,
                         noise_level=0.015,
+                        augment=is_train,
                     )
                     temporal_X.append(seq)
                     temporal_y.append(sign_id)

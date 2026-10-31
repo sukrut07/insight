@@ -22,17 +22,194 @@
     ]
   },
   "recognition_thresholds": {
-    "confidence_min": 0.60,
+    "confidence_min": 0.6,
     "stability_count": 4,
     "smoothing_window": 7,
     "temporal_window_size": 30
   },
   "alphabet": [
-    {"letter": "A", "hands": 1, "description": "Closed fist with thumb upright alongside the index finger.", "orientation": "palm facing outward"},
-    {"letter": "B", "hands": 2, "description": "Flat non-dominant hand touched at palm by dominant flat hand forming a B shape.", "orientation": "palms opposing"},
-    {"letter": "C", "hands": 1, "description": "Curved C-shape formed by fingers and thumb.", "orientation": "palm sideways"},
-    {"letter": "D", "hands": 2, "description": "Non-dominant index pointing up, dominant curved fingers completing the loop.", "orientation": "facing conversational partner"},
-    {"letter": "E", "hands": 2, "description": "Dominant index pointing to middle knuckle of non-dominant hand.", "orientation": "angled forward"}
+    {
+      "letter": "A",
+      "hands": 1,
+      "description": "Closed fist with thumb upright alongside the index finger.",
+      "orientation": "palm facing outward",
+      "tip": "Rest thumb firmly along side of index"
+    },
+    {
+      "letter": "B",
+      "hands": 2,
+      "description": "Flat non-dominant hand held palm facing right; dominant flat hand touches palm at right angle.",
+      "orientation": "palms opposing",
+      "tip": "Forms visual letter B intersection"
+    },
+    {
+      "letter": "C",
+      "hands": 1,
+      "description": "Curved C-shape formed by thumb and fingers with wide aperture.",
+      "orientation": "palm facing left/sideways",
+      "tip": "Arch fingers smoothly"
+    },
+    {
+      "letter": "D",
+      "hands": 2,
+      "description": "Non-dominant index finger points upward vertically; dominant thumb and index form semicircle touching its tip and base.",
+      "orientation": "facing partner",
+      "tip": "Creates closed loop on vertical bar"
+    },
+    {
+      "letter": "E",
+      "hands": 2,
+      "description": "Dominant index finger points to the tip of non-dominant index finger.",
+      "orientation": "angled forward",
+      "tip": "Clean single fingertip contact"
+    },
+    {
+      "letter": "F",
+      "hands": 2,
+      "description": "Index and middle fingers of dominant hand crossed horizontally over index and middle of non-dominant hand.",
+      "orientation": "palms down",
+      "tip": "Two crossed parallel fingers"
+    },
+    {
+      "letter": "G",
+      "hands": 2,
+      "description": "Both hands closed into fists placed together with dominant fist resting on non-dominant fist.",
+      "orientation": "palms inward",
+      "tip": "Stacked fists"
+    },
+    {
+      "letter": "H",
+      "hands": 2,
+      "description": "Non-dominant palm flat horizontal; dominant palm slides flat across it from wrist to fingertips.",
+      "orientation": "palms touching",
+      "tip": "Gentle sliding stroke"
+    },
+    {
+      "letter": "I",
+      "hands": 2,
+      "description": "Dominant index finger points to the tip of non-dominant middle finger.",
+      "orientation": "forward",
+      "tip": "Middle finger represents vowel I"
+    },
+    {
+      "letter": "J",
+      "hands": 2,
+      "description": "Dominant index touches tip of non-dominant middle finger, then traces small curved hook downward.",
+      "orientation": "tracing movement",
+      "tip": "Hook motion from middle fingertip"
+    },
+    {
+      "letter": "K",
+      "hands": 2,
+      "description": "Non-dominant index pointing upright; dominant index finger hooked sideways touching knuckle of non-dominant index.",
+      "orientation": "profile view",
+      "tip": "Hook against vertical post"
+    },
+    {
+      "letter": "L",
+      "hands": 1,
+      "description": "Thumb and index extended at right angle forming clear L shape; remaining fingers curled.",
+      "orientation": "palm forward",
+      "tip": "Classic crisp right angle"
+    },
+    {
+      "letter": "M",
+      "hands": 2,
+      "description": "Dominant three fingers (index, middle, ring) rest across palm of non-dominant flat hand.",
+      "orientation": "downward contact",
+      "tip": "Three bridge arches"
+    },
+    {
+      "letter": "N",
+      "hands": 2,
+      "description": "Dominant two fingers (index, middle) rest across palm of non-dominant flat hand.",
+      "orientation": "downward contact",
+      "tip": "Two bridge arches"
+    },
+    {
+      "letter": "O",
+      "hands": 2,
+      "description": "Dominant index finger points to the tip of non-dominant ring finger.",
+      "orientation": "forward",
+      "tip": "Ring finger represents vowel O"
+    },
+    {
+      "letter": "P",
+      "hands": 2,
+      "description": "Non-dominant index finger upright; dominant thumb and index form closed circle touching index tip.",
+      "orientation": "partner-facing",
+      "tip": "Round loop on top of post"
+    },
+    {
+      "letter": "Q",
+      "hands": 2,
+      "description": "Non-dominant hand forms circle with thumb and index; dominant index hooks into base of circle.",
+      "orientation": "downward slant",
+      "tip": "Circle with tail"
+    },
+    {
+      "letter": "R",
+      "hands": 2,
+      "description": "Dominant hooked index finger rests over non-dominant flat palm.",
+      "orientation": "palm up/down",
+      "tip": "Hook resting on shelf"
+    },
+    {
+      "letter": "S",
+      "hands": 2,
+      "description": "Little fingers of both hands linked or hooked together at chest level.",
+      "orientation": "hands intertwined",
+      "tip": "Interlocking pinkies"
+    },
+    {
+      "letter": "T",
+      "hands": 2,
+      "description": "Dominant index finger taps edge of non-dominant flat palm near thumb joint.",
+      "orientation": "edge contact",
+      "tip": "T-junction edge tap"
+    },
+    {
+      "letter": "U",
+      "hands": 2,
+      "description": "Dominant index finger points to the tip of non-dominant pinky finger.",
+      "orientation": "forward",
+      "tip": "Pinky represents vowel U"
+    },
+    {
+      "letter": "V",
+      "hands": 1,
+      "description": "Index and middle fingers extended apart in V shape; thumb holds down ring and pinky.",
+      "orientation": "palm outward",
+      "tip": "Peace / victory handshape"
+    },
+    {
+      "letter": "W",
+      "hands": 1,
+      "description": "Index, middle, and ring fingers extended apart forming W; thumb holds pinky.",
+      "orientation": "palm outward",
+      "tip": "Three extended spread fingers"
+    },
+    {
+      "letter": "X",
+      "hands": 2,
+      "description": "Index fingers of both hands crossed over each other at right angles.",
+      "orientation": "palms facing signer",
+      "tip": "Crossed index fingers"
+    },
+    {
+      "letter": "Y",
+      "hands": 1,
+      "description": "Thumb and pinky extended outward widely; middle three fingers curled firmly into palm.",
+      "orientation": "palm facing signer or forward",
+      "tip": "Shaka / phone handshape"
+    },
+    {
+      "letter": "Z",
+      "hands": 1,
+      "description": "Index finger extended, tracing zigzag Z trajectory through air.",
+      "orientation": "drawing path",
+      "tip": "Dynamic zigzag trace"
+    }
   ],
   "vocabulary": [
     {
@@ -214,6 +391,68 @@
       "hand_orientation": "index vertical, palm forward",
       "start_position": "shoulder level",
       "end_position": "side-to-side wag"
+    }
+  ],
+  "numbers": [
+    {
+      "number": "1",
+      "hands": 1,
+      "description": "Index finger extended upright, thumb holding other fingers.",
+      "orientation": "palm outward"
+    },
+    {
+      "number": "2",
+      "hands": 1,
+      "description": "Index and middle fingers extended upright and together or slightly spread.",
+      "orientation": "palm outward"
+    },
+    {
+      "number": "3",
+      "hands": 1,
+      "description": "Thumb, index, and middle fingers extended upright; ring and pinky curled.",
+      "orientation": "palm outward"
+    },
+    {
+      "number": "4",
+      "hands": 1,
+      "description": "Four fingers upright and spread, thumb tucked across palm.",
+      "orientation": "palm outward"
+    },
+    {
+      "number": "5",
+      "hands": 1,
+      "description": "Open flat hand with all five fingers spread widely.",
+      "orientation": "palm outward"
+    },
+    {
+      "number": "6",
+      "hands": 2,
+      "description": "Dominant hand shows 1 (index), non-dominant hand shows open 5.",
+      "orientation": "both palms outward"
+    },
+    {
+      "number": "7",
+      "hands": 2,
+      "description": "Dominant hand shows 2 (index, middle), non-dominant hand shows open 5.",
+      "orientation": "both palms outward"
+    },
+    {
+      "number": "8",
+      "hands": 2,
+      "description": "Dominant hand shows 3, non-dominant hand shows open 5.",
+      "orientation": "both palms outward"
+    },
+    {
+      "number": "9",
+      "hands": 2,
+      "description": "Dominant hand shows 4, non-dominant hand shows open 5.",
+      "orientation": "both palms outward"
+    },
+    {
+      "number": "10",
+      "hands": 2,
+      "description": "Both hands open with all 10 fingers spread facing forward.",
+      "orientation": "both palms outward"
     }
   ]
 }
