@@ -273,17 +273,18 @@ class OllamaGemmaE4BProvider(BaseAIProvider):
         t0 = time.perf_counter()
         full_prompt = f"{request.system_prompt}\n\n{request.prompt}" if request.system_prompt else request.prompt
 
+        # Gemma 4 MLX models in Ollama utilize thinking tokens; provide sufficient token headroom
+        token_budget = max(request.max_tokens, 550)
+
         payload: Dict[str, Any] = {
             "model": self.model,
             "prompt": full_prompt,
             "stream": False,
             "options": {
                 "temperature": request.temperature,
-                "num_predict": request.max_tokens
+                "num_predict": token_budget
             }
         }
-        if request.structured_json:
-            payload["format"] = "json"
 
         # Vision support if images present
         if request.images_base64:
@@ -362,17 +363,17 @@ class OllamaGemmaE2BProvider(BaseAIProvider):
         t0 = time.perf_counter()
         full_prompt = f"{request.system_prompt}\n\n{request.prompt}" if request.system_prompt else request.prompt
 
+        token_budget = max(request.max_tokens, 450)
+
         payload: Dict[str, Any] = {
             "model": self.model,
             "prompt": full_prompt,
             "stream": False,
             "options": {
                 "temperature": request.temperature,
-                "num_predict": min(request.max_tokens, 200)
+                "num_predict": token_budget
             }
         }
-        if request.structured_json:
-            payload["format"] = "json"
 
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
