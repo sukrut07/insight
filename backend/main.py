@@ -64,6 +64,14 @@ app.include_router(dataset.router, prefix="/api")
 app.include_router(languages.router, prefix="/api")
 app.include_router(websocket.router)
 
+from backend.schemas.gemma import ChatRequest, ChatResponse
+from backend.api.routes.gemma import chat_sign_assistant
+
+@app.post("/api/chat", response_model=ChatResponse, tags=["chat"])
+async def api_chat_alias(payload: ChatRequest):
+    return await chat_sign_assistant(payload)
+
+
 # Mount compiled React frontend in production / container environments
 FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 

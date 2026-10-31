@@ -10,7 +10,10 @@ from backend.schemas.gemma import (
     ModelCompareResponse,
     ModelBenchmarkResult,
     GemmaSettingsUpdate,
-    GemmaEvaluationStats
+    GemmaEvaluationStats,
+    ChatRequest,
+    ChatResponse,
+    ChatMessage
 )
 from backend.services.gemma_service import gemma_service
 

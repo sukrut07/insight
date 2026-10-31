@@ -524,6 +524,13 @@ class ModelOrchestrator:
             }
         }
 
+    async def generate(
+        self,
+        request: ModelRequest,
+        preferred_provider: Optional[str] = None
+    ) -> ModelResponse:
+        return await self.execute_task(request, preferred_provider)
+
     async def execute_task(
         self,
         request: ModelRequest,
@@ -531,7 +538,15 @@ class ModelOrchestrator:
     ) -> ModelResponse:
         """Executes reasoning/verification with intelligent hierarchy and fallback."""
         self.total_routed_tasks += 1
-        provider_preference = preferred_provider or settings.DEFAULT_AI_PROVIDER or settings.DEFAULT_PROVIDER
+        
+        # Prefer Gemini API if key is present and cloud is permitted by request
+        if preferred_provider is None:
+            if request.allow_cloud and settings.GEMINI_API_KEY.strip() and settings.CLOUD_CONSENT_GRANTED:
+                provider_preference = ProviderType.GEMINI_API.value
+            else:
+                provider_preference = settings.DEFAULT_AI_PROVIDER or settings.DEFAULT_PROVIDER
+        else:
+            provider_preference = preferred_provider
 
         # Direct explicit route if deterministic requested
         if provider_preference == ProviderType.DETERMINISTIC.value:
@@ -539,13 +554,14 @@ class ModelOrchestrator:
             self.provider_usage[ProviderType.DETERMINISTIC.value] += 1
             return det_resp
 
-        # 1. Cloud Gemini Attempt (Only if preferred, configured, and consented)
+        # 1. Cloud Gemini Attempt (If preferred/permitted and key configured)
         if provider_preference == ProviderType.GEMINI_API.value and settings.CLOUD_CONSENT_GRANTED:
             gemini_resp = await self.gemini.generate(request)
             if gemini_resp.status == "success":
                 self.provider_usage[ProviderType.GEMINI_API.value] += 1
                 return gemini_resp
             logger.warning(f"Gemini API attempt failed: {gemini_resp.error_message}. Falling back to Ollama E4B...")
+
 
         # Explicit route for E2B
         if provider_preference == ProviderType.OLLAMA_E2B.value:
