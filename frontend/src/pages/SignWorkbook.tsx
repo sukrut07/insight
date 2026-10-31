@@ -17,63 +17,53 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-interface AlphabetCard {
-  letter: string;
-  hands: number;
-  description: string;
-  orientation: string;
-  tip?: string;
-}
-
-interface NumberCard {
-  number: string;
-  hands: number;
-  description: string;
-  orientation: string;
-}
-
-interface VocabularyCard {
-  id: number;
-  label: string;
-  category: string;
-  hands: number;
-  description: string;
-  hand_orientation?: string;
-  start_position?: string;
-  end_position?: string;
-}
+import {
+  WORKBOOK_STATIC_DATA,
+  AlphabetCard,
+  NumberCard,
+  VocabularyCard,
+} from '../data/workbookData';
 
 export const SignWorkbook: React.FC = () => {
   const { activeLanguage, setActiveLanguage, setActiveTab } = useStore();
   const [activeCategory, setActiveCategory] = useState<'alphabet' | 'numbers' | 'vocabulary'>('alphabet');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLetter, setSelectedLetter] = useState<AlphabetCard | null>(null);
   const [filterHands, setFilterHands] = useState<'all' | '1' | '2'>('all');
 
-  const [alphabets, setAlphabets] = useState<AlphabetCard[]>([]);
-  const [numbers, setNumbers] = useState<NumberCard[]>([]);
-  const [vocabulary, setVocabulary] = useState<VocabularyCard[]>([]);
-  const [loading, setLoading] = useState(true);
+  const initialData = WORKBOOK_STATIC_DATA[activeLanguage] || WORKBOOK_STATIC_DATA.ISL;
 
-  // Fetch language data from backend API
+  const [alphabets, setAlphabets] = useState<AlphabetCard[]>(initialData.alphabet);
+  const [numbers, setNumbers] = useState<NumberCard[]>(initialData.numbers);
+  const [vocabulary, setVocabulary] = useState<VocabularyCard[]>(initialData.vocabulary);
+  const [selectedLetter, setSelectedLetter] = useState<AlphabetCard | null>(initialData.alphabet[0] || null);
+  const [loading, setLoading] = useState(false);
+
+  // Sync with active language and optionally fetch live updates from backend API
   useEffect(() => {
+    const localData = WORKBOOK_STATIC_DATA[activeLanguage] || WORKBOOK_STATIC_DATA.ISL;
+    setAlphabets(localData.alphabet);
+    setNumbers(localData.numbers);
+    setVocabulary(localData.vocabulary);
+    setSelectedLetter(localData.alphabet[0] || null);
+
     const fetchLanguageData = async () => {
-      setLoading(true);
       try {
         const resp = await fetch(`${API_BASE}/languages/${activeLanguage.toLowerCase()}/config`);
         if (resp.ok) {
           const data = await resp.json();
-          setAlphabets(data.alphabet || []);
-          setNumbers(data.numbers || []);
-          setVocabulary(data.vocabulary || []);
           if (data.alphabet && data.alphabet.length > 0) {
+            setAlphabets(data.alphabet);
             setSelectedLetter(data.alphabet[0]);
+          }
+          if (data.numbers && data.numbers.length > 0) {
+            setNumbers(data.numbers);
+          }
+          if (data.vocabulary && data.vocabulary.length > 0) {
+            setVocabulary(data.vocabulary);
           }
         }
       } catch (err) {
-        console.error('Failed to load workbook data:', err);
-      } finally {
-        setLoading(false);
+        // Fallback already active and populated
       }
     };
     fetchLanguageData();
@@ -168,15 +158,15 @@ export const SignWorkbook: React.FC = () => {
               <button
                 key={lang}
                 onClick={() => setActiveLanguage(lang)}
-                className={`neo-pill px-4 py-2 text-sm font-bold transition-all ${
+                className={`inline-flex items-center justify-center px-4 py-2 border-2 border-charcoal rounded-full text-sm font-bold transition-all ${
                   isSelected
-                    ? 'bg-charcoal text-white shadow-hard-sm'
+                    ? '!bg-[#242424] !text-white shadow-hard-sm'
                     : 'bg-white text-charcoal hover:bg-cream-200'
                 }`}
               >
                 <span className="mr-1.5">{languageNames[lang].flag}</span>
-                <span>{lang}</span>
-                <span className="ml-2 text-xs opacity-75 hidden sm:inline">
+                <span className={isSelected ? 'text-white' : 'text-charcoal'}>{lang}</span>
+                <span className={`ml-2 text-xs hidden sm:inline ${isSelected ? 'text-white/80' : 'text-charcoal/70'}`}>
                   ({languageNames[lang].name})
                 </span>
               </button>

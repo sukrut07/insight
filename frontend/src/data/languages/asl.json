@@ -1,0 +1,374 @@
+{
+  "language_id": "ASL",
+  "name": "American Sign Language",
+  "native_name": "American Sign Language",
+  "family": "French Sign Language Family (Francosign)",
+  "status": "experimental",
+  "model_version": "asl_v1_prototype",
+  "grammar_structure": "Topic-Comment and Subject-Verb-Object (SVO) with Non-Manual Signals",
+  "fingerspelling_type": "one_handed_asl",
+  "alphabet_description": "ASL uses a primarily one-handed fingerspelling alphabet originating from the French manual alphabet. Each of the 26 letters is produced with the dominant hand.",
+  "classifier_paths": {
+    "static": "models/gesture/asl_static_rf.joblib",
+    "temporal": "models/gesture/asl_temporal_lstm.pt",
+    "holistic": "models/gesture/asl_holistic_v1.pt"
+  },
+  "dataset_paths": {
+    "raw": "data/asl/raw",
+    "processed": "data/asl/processed",
+    "research_references": [
+      "WLASL - Word-Level American Sign Language (dxli94.github.io/WLASL)",
+      "MS-ASL (Microsoft Research ASL Dataset)"
+    ]
+  },
+  "recognition_thresholds": {
+    "confidence_min": 0.65,
+    "stability_count": 4,
+    "smoothing_window": 7,
+    "temporal_window_size": 30
+  },
+  "alphabet": [
+    {
+      "letter": "A",
+      "hands": 1,
+      "description": "Closed fist with thumb resting alongside the index finger.",
+      "orientation": "palm facing outward",
+      "tip": "Thumb upright against index"
+    },
+    {
+      "letter": "B",
+      "hands": 1,
+      "description": "Four fingers upright and together, thumb folded across palm.",
+      "orientation": "palm facing outward",
+      "tip": "Flat palm with thumb tucked across"
+    },
+    {
+      "letter": "C",
+      "hands": 1,
+      "description": "Fingers and thumb curved to form an open C shape.",
+      "orientation": "palm sideways",
+      "tip": "C-curve aperture"
+    },
+    {
+      "letter": "D",
+      "hands": 1,
+      "description": "Index finger points straight up; middle, ring, pinky touch thumb tip to form circle.",
+      "orientation": "palm forward",
+      "tip": "Single index finger pointing up"
+    },
+    {
+      "letter": "E",
+      "hands": 1,
+      "description": "Fingers curled tightly with tips resting on thumb tucked below.",
+      "orientation": "palm forward",
+      "tip": "Clawed finger tips on thumb"
+    },
+    {
+      "letter": "F",
+      "hands": 1,
+      "description": "Index finger and thumb touch to form circle; middle, ring, pinky fan out upright.",
+      "orientation": "palm forward",
+      "tip": "OK sign handshape"
+    },
+    {
+      "letter": "G",
+      "hands": 1,
+      "description": "Index finger and thumb extended horizontally parallel to each other; others curled.",
+      "orientation": "palm facing signer or sideways",
+      "tip": "Horizontal pinch frame"
+    },
+    {
+      "letter": "H",
+      "hands": 1,
+      "description": "Index and middle fingers extended together horizontally; thumb folded over ring/pinky.",
+      "orientation": "palm facing signer",
+      "tip": "Two horizontal fingers"
+    },
+    {
+      "letter": "I",
+      "hands": 1,
+      "description": "Pinky finger extended upright; thumb holds remaining three fingers into palm.",
+      "orientation": "palm forward",
+      "tip": "Solo pinky upright"
+    },
+    {
+      "letter": "J",
+      "hands": 1,
+      "description": "Pinky finger extended upright, then traces letter J curve downward and scoops up.",
+      "orientation": "tracing movement",
+      "tip": "Pinky tracing dynamic hook"
+    },
+    {
+      "letter": "K",
+      "hands": 1,
+      "description": "Index finger points up, middle finger angles forward, thumb rests between them at base.",
+      "orientation": "palm forward",
+      "tip": "V shape with thumb wedged between"
+    },
+    {
+      "letter": "L",
+      "hands": 1,
+      "description": "Thumb and index finger extended at right angle forming crisp L; other fingers curled.",
+      "orientation": "palm forward",
+      "tip": "Crisp 90 degree angle"
+    },
+    {
+      "letter": "M",
+      "hands": 1,
+      "description": "Thumb tucked under three fingers (index, middle, ring); pinky curled beside.",
+      "orientation": "palm facing forward",
+      "tip": "Three fingers draped over thumb"
+    },
+    {
+      "letter": "N",
+      "hands": 1,
+      "description": "Thumb tucked under two fingers (index, middle); ring and pinky curled.",
+      "orientation": "palm facing forward",
+      "tip": "Two fingers draped over thumb"
+    },
+    {
+      "letter": "O",
+      "hands": 1,
+      "description": "All fingertips touch thumb tip forming a circular O shape.",
+      "orientation": "palm sideways/forward",
+      "tip": "Complete circle"
+    },
+    {
+      "letter": "P",
+      "hands": 1,
+      "description": "Similar to K handshape but pointed downward with middle finger pointing down and index forward.",
+      "orientation": "palm facing downward",
+      "tip": "Downward pointing K"
+    },
+    {
+      "letter": "Q",
+      "hands": 1,
+      "description": "Similar to G handshape (thumb and index parallel) but pointing downward.",
+      "orientation": "palm facing downward",
+      "tip": "Downward pointing pinch"
+    },
+    {
+      "letter": "R",
+      "hands": 1,
+      "description": "Index and middle fingers crossed over each other; thumb holds ring and pinky.",
+      "orientation": "palm facing forward",
+      "tip": "Fingers crossed for luck"
+    },
+    {
+      "letter": "S",
+      "hands": 1,
+      "description": "Tight fist with thumb wrapped across the front of all curled fingers.",
+      "orientation": "palm facing forward",
+      "tip": "Fist with thumb across knuckles"
+    },
+    {
+      "letter": "T",
+      "hands": 1,
+      "description": "Thumb tucked between index and middle finger inside fist.",
+      "orientation": "palm facing forward",
+      "tip": "Thumb peeking between index/middle"
+    },
+    {
+      "letter": "U",
+      "hands": 1,
+      "description": "Index and middle fingers extended straight up and pressed tightly together.",
+      "orientation": "palm facing forward",
+      "tip": "Two fingers held together upright"
+    },
+    {
+      "letter": "V",
+      "hands": 1,
+      "description": "Index and middle fingers extended straight up and spread apart in V shape.",
+      "orientation": "palm facing forward",
+      "tip": "Peace sign"
+    },
+    {
+      "letter": "W",
+      "hands": 1,
+      "description": "Index, middle, and ring fingers extended and spread apart in W shape.",
+      "orientation": "palm facing forward",
+      "tip": "Three fingers spread upright"
+    },
+    {
+      "letter": "X",
+      "hands": 1,
+      "description": "Index finger bent into a hook shape; other fingers curled into palm with thumb resting.",
+      "orientation": "palm facing forward or sideways",
+      "tip": "Hooked index finger"
+    },
+    {
+      "letter": "Y",
+      "hands": 1,
+      "description": "Thumb and pinky extended widely outward; three middle fingers folded tightly into palm.",
+      "orientation": "palm facing forward",
+      "tip": "Shaka sign"
+    },
+    {
+      "letter": "Z",
+      "hands": 1,
+      "description": "Index finger extended, drawing zigzag letter Z in the air in front of signer.",
+      "orientation": "drawing path",
+      "tip": "Draw zigzag Z with index"
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": 0,
+      "label": "HELLO",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "greeting",
+      "description": "Dominant open hand with thumb tucked touches temple and moves forward/outward like a salute.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing slightly left/forward",
+      "start_position": "temple",
+      "end_position": "forward arc salute"
+    },
+    {
+      "id": 1,
+      "label": "THANK_YOU",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Fingertips of flat dominant hand touch chin/lips and arc outward toward the conversational partner.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing signer at chin, then tilting forward",
+      "start_position": "chin/mouth",
+      "end_position": "forward toward conversational partner"
+    },
+    {
+      "id": 2,
+      "label": "PLEASE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Flat dominant hand rubs in a clockwise circle over the center of the chest.",
+      "frame_count": 30,
+      "hand_orientation": "palm flat against chest",
+      "start_position": "mid-chest",
+      "end_position": "circular stroke on chest"
+    },
+    {
+      "id": 3,
+      "label": "HELP",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "emergency",
+      "description": "Closed dominant fist with thumb extended upward rests on flat upward palm of non-dominant hand; both lift together.",
+      "frame_count": 30,
+      "hand_orientation": "non-dominant palm up, dominant fist upright",
+      "start_position": "chest level",
+      "end_position": "lifted upward together"
+    },
+    {
+      "id": 4,
+      "label": "YES",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "response",
+      "description": "Fist (S-handshape) tilts forward and back at wrist, nodding like a head.",
+      "frame_count": 25,
+      "hand_orientation": "knuckles facing forward",
+      "start_position": "chest level",
+      "end_position": "wrist nod down"
+    },
+    {
+      "id": 5,
+      "label": "NO",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "response",
+      "description": "Index and middle fingers snap down onto the thumb tip like a closing beak.",
+      "frame_count": 20,
+      "hand_orientation": "palm facing forward",
+      "start_position": "chest level",
+      "end_position": "snap onto thumb"
+    },
+    {
+      "id": 6,
+      "label": "WANT",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "basic_needs",
+      "description": "Both open hands with palms up curve into claw shape while pulling back toward body.",
+      "frame_count": 30,
+      "hand_orientation": "palms up, curving into claws",
+      "start_position": "extended forward",
+      "end_position": "pulled toward torso"
+    },
+    {
+      "id": 7,
+      "label": "NEED",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "basic_needs",
+      "description": "X-handshape (crooked index finger) bends downward firmly from the wrist repeatedly.",
+      "frame_count": 25,
+      "hand_orientation": "crooked index pointing downward",
+      "start_position": "chest level",
+      "end_position": "wrist flex downward"
+    }
+  ],
+  "numbers": [
+    {
+      "number": "1",
+      "hands": 1,
+      "description": "Index finger extended upright, palm facing forward.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "2",
+      "hands": 1,
+      "description": "Index and middle fingers extended in V shape.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "3",
+      "hands": 1,
+      "description": "Thumb, index, and middle fingers extended (classic ASL 3).",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "4",
+      "hands": 1,
+      "description": "Four fingers extended upright, thumb folded across palm.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "5",
+      "hands": 1,
+      "description": "All five fingers spread widely open.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "6",
+      "hands": 1,
+      "description": "Thumb touches pinky fingernail tip; index, middle, ring extended.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "7",
+      "hands": 1,
+      "description": "Thumb touches ring fingernail tip; index, middle, pinky extended.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "8",
+      "hands": 1,
+      "description": "Thumb touches middle fingernail tip; index, ring, pinky extended.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "9",
+      "hands": 1,
+      "description": "Thumb touches index fingernail tip (F-shape); middle, ring, pinky extended.",
+      "orientation": "palm forward"
+    },
+    {
+      "number": "10",
+      "hands": 1,
+      "description": "Fist with thumb upright wagging/shaking side-to-side.",
+      "orientation": "palm sideways shaking"
+    }
+  ]
+}
