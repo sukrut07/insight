@@ -1,0 +1,135 @@
+{
+  "language_id": "BSL",
+  "name": "British Sign Language",
+  "native_name": "British Sign Language",
+  "family": "BANZSL (British, Australian and New Zealand Sign Language)",
+  "status": "experimental",
+  "model_version": "bsl_v1_prototype",
+  "grammar_structure": "Topic-Comment with Non-Manual Features (NMF)",
+  "fingerspelling_type": "two_handed_bsl",
+  "alphabet_description": "BSL uses a distinctive two-handed fingerspelling alphabet. Vowels are formed by placing the index finger of the dominant hand onto the fingers of the non-dominant hand (Thumb=A, Index=E, Middle=I, Ring=O, Little finger=U). Consonants use specific two-handed touch points.",
+  "classifier_paths": {
+    "static": "models/gesture/bsl_static_rf.joblib",
+    "temporal": "models/gesture/bsl_temporal_lstm.pt",
+    "holistic": "models/gesture/bsl_holistic_v1.pt"
+  },
+  "dataset_paths": {
+    "raw": "data/bsl/raw",
+    "processed": "data/bsl/processed",
+    "research_references": [
+      "SignBSL Reference Archive (signbsl.com)",
+      "BSL Corpus Project (UCL / DCAL)"
+    ]
+  },
+  "recognition_thresholds": {
+    "confidence_min": 0.65,
+    "stability_count": 4,
+    "smoothing_window": 7,
+    "temporal_window_size": 30
+  },
+  "alphabet": [
+    {"letter": "A", "hands": 2, "description": "Dominant index touches non-dominant thumb.", "orientation": "open non-dominant palm facing signer"},
+    {"letter": "B", "hands": 2, "description": "Form two circles with index and thumbs touching on both hands, forming an 8-like B shape.", "orientation": "palms opposing"},
+    {"letter": "C", "hands": 1, "description": "Dominant hand forms curved C.", "orientation": "sideways palm"},
+    {"letter": "D", "hands": 2, "description": "Dominant index and thumb form curved arch touching non-dominant upright index finger.", "orientation": "facing conversational partner"},
+    {"letter": "E", "hands": 2, "description": "Dominant index touches tip of non-dominant index finger.", "orientation": "non-dominant palm facing signer"}
+  ],
+  "vocabulary": [
+    {
+      "id": 0,
+      "label": "HELLO",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "greeting",
+      "description": "Open hand held by side of head waving or moving forward in a polite palm salute.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing partner",
+      "start_position": "temple level",
+      "end_position": "slight outward salute"
+    },
+    {
+      "id": 1,
+      "label": "GOODBYE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "greeting",
+      "description": "Open hand raised at shoulder level oscillating or waving fingers downward.",
+      "frame_count": 30,
+      "hand_orientation": "palm forward",
+      "start_position": "shoulder level",
+      "end_position": "flutter wave"
+    },
+    {
+      "id": 2,
+      "label": "THANK_YOU",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Fingers of dominant flat hand touch chin and move forward toward other person.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing signer at chin, then tilts forward",
+      "start_position": "chin",
+      "end_position": "moving outward forward"
+    },
+    {
+      "id": 3,
+      "label": "PLEASE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Flat dominant hand moves smoothly down or rubs palm on chest in polite request.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing body",
+      "start_position": "chin/upper chest",
+      "end_position": "mid chest stroke"
+    },
+    {
+      "id": 4,
+      "label": "HELP",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "emergency",
+      "description": "Dominant flat hand supports the non-dominant closed fist or arm, lifting upwards together.",
+      "frame_count": 30,
+      "hand_orientation": "dominant palm supporting non-dominant hand/wrist",
+      "start_position": "chest level",
+      "end_position": "raised upwards firmly"
+    },
+    {
+      "id": 5,
+      "label": "NAME",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "social",
+      "description": "Dominant 'H' (index & middle) fingers tap across non-dominant 'H' fingers twice.",
+      "frame_count": 30,
+      "hand_orientation": "extended two fingers crossing",
+      "start_position": "chest level",
+      "end_position": "double tap"
+    },
+    {
+      "id": 6,
+      "label": "YES",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "response",
+      "description": "Closed fist with wrist flexing up and down mimicking a head nod.",
+      "frame_count": 20,
+      "hand_orientation": "knuckles facing outward",
+      "start_position": "chest level",
+      "end_position": "wrist nod down"
+    },
+    {
+      "id": 7,
+      "label": "NO",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "response",
+      "description": "Both open hands with palms downward cross over and push outward decisively.",
+      "frame_count": 25,
+      "hand_orientation": "palms downward",
+      "start_position": "crossed at chest",
+      "end_position": "swept outward"
+    }
+  ]
+}

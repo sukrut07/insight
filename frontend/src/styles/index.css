@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #F8F6EF;
+    --foreground: #242424;
+    --surface: #FFFFFF;
+    --mint: #CDEFD4;
+    --lavender: #E8DDFB;
+    --blue: #C8E9F7;
+    --pink: #F8CFD0;
+    --yellow: #F9E9B7;
+    --muted: #77736E;
+    --border: #242424;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Neo-Brutalist Components */
+.neo-card {
+  background-color: #FFFFFF;
+  border: 2px solid #242424;
+  border-radius: 20px;
+  box-shadow: 5px 5px 0px #242424;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neo-card-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px #242424;
+}
+
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #242424;
+  border-radius: 16px;
+  font-weight: 700;
+  box-shadow: 4px 4px 0px #242424;
+  transition: all 0.15s ease-out;
+}
+
+.neo-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px #242424;
+}
+
+.neo-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #242424;
+}
+
+.neo-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #242424;
+  border-radius: 9999px;
+  font-weight: 600;
+  background-color: #FFFFFF;
+  box-shadow: 3px 3px 0px #242424;
+  transition: all 0.15s ease-out;
+}
+
+.neo-pill:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #242424;
+}
+
+.neo-pill:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #242424;
+}
+
+/* Hard Shadows */
+.shadow-hard-xs {
+  box-shadow: 2px 2px 0px #242424;
+}
+.shadow-hard-sm {
+  box-shadow: 3px 3px 0px #242424;
+}
+.shadow-hard {
+  box-shadow: 5px 5px 0px #242424;
+}
+.shadow-hard-lg {
+  box-shadow: 8px 8px 0px #242424;
+}
+
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F6EF;
+}
+::-webkit-scrollbar-thumb {
+  background: #242424;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #545454;
+}

@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    {
+      "id": 15,
+      "label": "CUSTOM_WELCOME_TEST",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "social",
+      "description": "Two open palms held outward welcoming guests.",
+      "frame_count": 30,
+      "is_plugin": true
+    }
+  ]
+}

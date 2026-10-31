@@ -1,0 +1,142 @@
+{
+  "version": "1.0.0",
+  "name": "ISL Core Vocabulary",
+  "source": "Indian Sign Language Research and Training Centre (ISLRTC) Standard",
+  "signs": [
+    {
+      "id": 0,
+      "label": "HELLO",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "greeting",
+      "description": "Dominant open hand placed near forehead/temple and arced smoothly outward in greeting.",
+      "frame_count": 30
+    },
+    {
+      "id": 1,
+      "label": "GOODBYE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "greeting",
+      "description": "Open hand raised at chest level oscillating side to side.",
+      "frame_count": 30
+    },
+    {
+      "id": 2,
+      "label": "THANK_YOU",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Flat open hand touching chin/mouth, moving gently outward toward person.",
+      "frame_count": 30
+    },
+    {
+      "id": 3,
+      "label": "PLEASE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Open flat palm gently rubbing in a circular motion on the chest.",
+      "frame_count": 30
+    },
+    {
+      "id": 4,
+      "label": "SORRY",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Closed fist gently rotating over the heart/chest area.",
+      "frame_count": 30
+    },
+    {
+      "id": 5,
+      "label": "HELP",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "emergency",
+      "description": "Non-dominant flat palm facing up; dominant fist with thumb upright placed on palm and lifted together.",
+      "frame_count": 30
+    },
+    {
+      "id": 6,
+      "label": "YES",
+      "type": "static",
+      "hands": 1,
+      "category": "response",
+      "description": "Fist held upright and tilted forward/downward in an affirmative nod.",
+      "frame_count": 1
+    },
+    {
+      "id": 7,
+      "label": "NO",
+      "type": "static",
+      "hands": 1,
+      "category": "response",
+      "description": "Index and middle fingers snapping or pressing against the thumb horizontally.",
+      "frame_count": 1
+    },
+    {
+      "id": 8,
+      "label": "WATER",
+      "type": "static",
+      "hands": 1,
+      "category": "basic_needs",
+      "description": "Hand forming a 'W' or cup shape tapping gently at the corner of the mouth/chin.",
+      "frame_count": 1
+    },
+    {
+      "id": 9,
+      "label": "FOOD",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "basic_needs",
+      "description": "Flattened O-shape hand brought repeatedly near the mouth.",
+      "frame_count": 30
+    },
+    {
+      "id": 10,
+      "label": "I",
+      "type": "static",
+      "hands": 1,
+      "category": "pronoun",
+      "description": "Index finger pointing directly at the center of the chest.",
+      "frame_count": 1
+    },
+    {
+      "id": 11,
+      "label": "YOU",
+      "type": "static",
+      "hands": 1,
+      "category": "pronoun",
+      "description": "Index finger pointing forward directly toward conversational partner/camera.",
+      "frame_count": 1
+    },
+    {
+      "id": 12,
+      "label": "MY",
+      "type": "static",
+      "hands": 1,
+      "category": "pronoun",
+      "description": "Open flat palm placed gently flat on the center of the chest.",
+      "frame_count": 1
+    },
+    {
+      "id": 13,
+      "label": "WHAT",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "question",
+      "description": "Both open hands held out with palms facing upward, shaking gently side to side.",
+      "frame_count": 30
+    },
+    {
+      "id": 14,
+      "label": "WHERE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "question",
+      "description": "Index finger pointed upward, wagging gently left to right in an inquiring motion.",
+      "frame_count": 30
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "language_id": "ASL",
+  "name": "American Sign Language",
+  "native_name": "American Sign Language",
+  "family": "French Sign Language Family (Francosign)",
+  "status": "experimental",
+  "model_version": "asl_v1_prototype",
+  "grammar_structure": "Topic-Comment and Subject-Verb-Object (SVO) with Non-Manual Signals",
+  "fingerspelling_type": "one_handed_asl",
+  "alphabet_description": "ASL uses a primarily one-handed fingerspelling alphabet originating from the French manual alphabet. Each of the 26 letters is produced with the dominant hand.",
+  "classifier_paths": {
+    "static": "models/gesture/asl_static_rf.joblib",
+    "temporal": "models/gesture/asl_temporal_lstm.pt",
+    "holistic": "models/gesture/asl_holistic_v1.pt"
+  },
+  "dataset_paths": {
+    "raw": "data/asl/raw",
+    "processed": "data/asl/processed",
+    "research_references": [
+      "WLASL - Word-Level American Sign Language (dxli94.github.io/WLASL)",
+      "MS-ASL (Microsoft Research ASL Dataset)"
+    ]
+  },
+  "recognition_thresholds": {
+    "confidence_min": 0.65,
+    "stability_count": 4,
+    "smoothing_window": 7,
+    "temporal_window_size": 30
+  },
+  "alphabet": [
+    {"letter": "A", "hands": 1, "description": "Fist with thumb resting alongside index finger.", "orientation": "palm facing outward"},
+    {"letter": "B", "hands": 1, "description": "Four fingers upright and together, thumb folded across palm.", "orientation": "palm forward"},
+    {"letter": "C", "hands": 1, "description": "Fingers and thumb curved to form a C shape.", "orientation": "palm sideways"},
+    {"letter": "D", "hands": 1, "description": "Index finger pointing up, other three fingers touching thumb tip forming a circle.", "orientation": "palm forward"},
+    {"letter": "E", "hands": 1, "description": "Fingers curled with tips resting on thumb folded below.", "orientation": "palm forward"}
+  ],
+  "vocabulary": [
+    {
+      "id": 0,
+      "label": "HELLO",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "greeting",
+      "description": "Dominant open hand with thumb tucked touches temple and moves forward/outward like a salute.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing slightly left/forward",
+      "start_position": "temple",
+      "end_position": "forward arc salute"
+    },
+    {
+      "id": 1,
+      "label": "THANK_YOU",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Fingertips of flat dominant hand touch chin/lips and arc outward toward the conversational partner.",
+      "frame_count": 30,
+      "hand_orientation": "palm facing signer at chin, then tilting forward",
+      "start_position": "chin/mouth",
+      "end_position": "forward toward conversational partner"
+    },
+    {
+      "id": 2,
+      "label": "PLEASE",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "social",
+      "description": "Flat dominant hand rubs in a clockwise circle over the center of the chest.",
+      "frame_count": 30,
+      "hand_orientation": "palm flat against chest",
+      "start_position": "mid-chest",
+      "end_position": "circular stroke on chest"
+    },
+    {
+      "id": 3,
+      "label": "HELP",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "emergency",
+      "description": "Closed dominant fist with thumb extended upward rests on flat upward palm of non-dominant hand; both lift together.",
+      "frame_count": 30,
+      "hand_orientation": "non-dominant palm up, dominant fist upright",
+      "start_position": "chest level",
+      "end_position": "lifted upward together"
+    },
+    {
+      "id": 4,
+      "label": "YES",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "response",
+      "description": "Fist (S-handshape) tilts forward and back at wrist, nodding like a head.",
+      "frame_count": 25,
+      "hand_orientation": "knuckles facing forward",
+      "start_position": "chest level",
+      "end_position": "wrist nod down"
+    },
+    {
+      "id": 5,
+      "label": "NO",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "response",
+      "description": "Index and middle fingers snap down onto the thumb tip like a closing beak.",
+      "frame_count": 20,
+      "hand_orientation": "palm facing forward",
+      "start_position": "chest level",
+      "end_position": "snap onto thumb"
+    },
+    {
+      "id": 6,
+      "label": "WANT",
+      "type": "dynamic",
+      "hands": 2,
+      "category": "basic_needs",
+      "description": "Both open hands with palms up curve into claw shape while pulling back toward body.",
+      "frame_count": 30,
+      "hand_orientation": "palms up, curving into claws",
+      "start_position": "extended forward",
+      "end_position": "pulled toward torso"
+    },
+    {
+      "id": 7,
+      "label": "NEED",
+      "type": "dynamic",
+      "hands": 1,
+      "category": "basic_needs",
+      "description": "X-handshape (crooked index finger) bends downward firmly from the wrist repeatedly.",
+      "frame_count": 25,
+      "hand_orientation": "crooked index pointing downward",
+      "start_position": "chest level",
+      "end_position": "wrist flex downward"
+    }
+  ]
+}
