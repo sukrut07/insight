@@ -45,16 +45,26 @@ def create_base_hand_pose(
     # Spread varies depending on hand type
     if pose_type == "spread_5":
         finger_angles = [-0.75, -0.35, 0.0, 0.35, 0.75]
-    elif pose_type in ("salute", "flat_b", "flat_chest", "flat_press"):
-        finger_angles = [-0.55, -0.10, 0.0, 0.10, 0.20]  # Fingers closely together
+    elif pose_type == "salute":
+        finger_angles = [-0.55, -0.12, 0.0, 0.10, 0.22]
+    elif pose_type == "flat_b":
+        finger_angles = [-0.60, -0.08, 0.0, 0.08, 0.18]
+    elif pose_type == "flat_chest":
+        finger_angles = [-0.50, -0.15, 0.0, 0.15, 0.30]
+    elif pose_type == "flat_press":
+        finger_angles = [-0.45, -0.05, 0.0, 0.05, 0.12]
     elif pose_type == "w_hand":
-        finger_angles = [-0.60, -0.28, 0.0, 0.28, 0.55]  # W spread
+        finger_angles = [-0.60, -0.28, 0.0, 0.28, 0.55]
     elif pose_type in ("pinch_snap", "no"):
         finger_angles = [-0.40, -0.15, -0.05, 0.25, 0.45]
     elif pose_type == "flat_o":
         finger_angles = [-0.30, -0.10, 0.0, 0.10, 0.25]
-    elif pose_type in ("point_chest", "point_forward", "point_up"):
+    elif pose_type == "point_chest":
         finger_angles = [-0.45, -0.05, 0.15, 0.30, 0.45]
+    elif pose_type == "point_forward":
+        finger_angles = [-0.45, -0.05, 0.15, 0.30, 0.45]
+    elif pose_type == "point_up":
+        finger_angles = [-0.45, 0.0, 0.15, 0.30, 0.45]
     else:  # fist, fist_a, fist_s
         finger_angles = [-0.40, -0.18, 0.0, 0.18, 0.36]
 
@@ -69,64 +79,34 @@ def create_base_hand_pose(
         if f_idx == 0:  # Thumb
             if pose_type in ("fist_a", "fist"):
                 curled = True
-                thumb_tuck = 0.8  # Resting on side of index
             elif pose_type == "fist_s":
                 curled = True
-                thumb_tuck = 0.5  # Crossed over front of fingers
             elif pose_type in ("pinch_snap", "no", "flat_o"):
                 curled = False
-                thumb_tuck = 0.3  # Touching finger tips
             elif pose_type == "w_hand":
                 curled = True
-                thumb_tuck = 0.9  # Holding pinky
-            elif pose_type in ("salute", "flat_b"):
-                curled = False
-                thumb_tuck = 0.7  # Folded close along palm
             else:
                 curled = False
-                thumb_tuck = 0.0
             mcp_dist = scale * 0.40
             seg_len = scale * 0.25
 
         elif f_idx == 1:  # Index
-            if pose_type in ("fist", "fist_a", "fist_s"):
-                curled = True
-            elif pose_type == "flat_o":
-                curled = True  # Pinched curve
-            else:
-                curled = False  # Extended for salute, spread, flat_b, point, w_hand, pinch_snap
+            curled = pose_type in ("fist", "fist_a", "fist_s", "flat_o")
             mcp_dist = scale * 0.55
             seg_len = scale * 0.28
 
         elif f_idx == 2:  # Middle
-            if pose_type in ("fist", "fist_a", "fist_s", "point_chest", "point_forward", "point_up"):
-                curled = True
-            elif pose_type == "flat_o":
-                curled = True
-            else:
-                curled = False  # Extended for salute, spread, flat_b, w_hand, pinch_snap
+            curled = pose_type in ("fist", "fist_a", "fist_s", "flat_o", "point_chest", "point_forward", "point_up")
             mcp_dist = scale * 0.60
             seg_len = scale * 0.30
 
         elif f_idx == 3:  # Ring
-            if pose_type in ("fist", "fist_a", "fist_s", "point_chest", "point_forward", "point_up", "pinch_snap", "no"):
-                curled = True
-            elif pose_type == "flat_o":
-                curled = True
-            elif pose_type == "w_hand":
-                curled = False  # W-shape extends ring finger!
-            else:
-                curled = False  # Extended for salute, spread, flat_b, flat_chest
+            curled = pose_type in ("fist", "fist_a", "fist_s", "flat_o", "point_chest", "point_forward", "point_up", "pinch_snap", "no")
             mcp_dist = scale * 0.53
             seg_len = scale * 0.27
 
         else:  # Pinky (f_idx == 4)
-            if pose_type in ("fist", "fist_a", "fist_s", "point_chest", "point_forward", "point_up", "pinch_snap", "no", "w_hand"):
-                curled = True  # Pinky is curled for point, pinch, and w_hand!
-            elif pose_type == "flat_o":
-                curled = True
-            else:
-                curled = False  # Extended for salute, spread, flat_b, flat_chest
+            curled = pose_type in ("fist", "fist_a", "fist_s", "flat_o", "point_chest", "point_forward", "point_up", "pinch_snap", "no", "w_hand")
             mcp_dist = scale * 0.45
             seg_len = scale * 0.23
 
@@ -146,10 +126,31 @@ def create_base_hand_pose(
                 cur_py += np.cos(base_angle) * (seg_len * curl_in)
                 cur_pz -= seg_len * 0.45
             else:
-                # Anatomical extension outward
-                cur_px += np.sin(base_angle) * seg_len
-                cur_py -= np.cos(base_angle) * seg_len
-                cur_pz += np.random.randn() * 0.005
+                # Anatomical extension outward with 3D orientation awareness
+                if pose_type == "point_chest" and f_idx == 1:
+                    cur_px += np.sin(base_angle) * (seg_len * 0.4)
+                    cur_py += seg_len * 0.2
+                    cur_pz -= seg_len * 0.8  # Pointing into chest
+                elif pose_type == "point_forward" and f_idx == 1:
+                    cur_px += np.sin(base_angle) * (seg_len * 0.3)
+                    cur_py -= seg_len * 0.3
+                    cur_pz -= seg_len * 0.85  # Pointing forward toward partner/camera
+                elif pose_type == "point_up" and f_idx == 1:
+                    cur_px += np.sin(base_angle) * (seg_len * 0.1)
+                    cur_py -= seg_len * 0.95  # Pointing straight up
+                    cur_pz += 0.0
+                elif pose_type == "flat_b":
+                    cur_px += np.sin(base_angle) * seg_len
+                    cur_py -= np.cos(base_angle) * (seg_len * 0.7)
+                    cur_pz -= seg_len * 0.5  # Angled forward
+                elif pose_type == "salute":
+                    cur_px += np.sin(base_angle) * (seg_len * 1.1)
+                    cur_py -= np.cos(base_angle) * (seg_len * 0.8)
+                    cur_pz -= seg_len * 0.1
+                else:
+                    cur_px += np.sin(base_angle) * seg_len
+                    cur_py -= np.cos(base_angle) * seg_len
+                    cur_pz += np.random.randn() * 0.003
 
             landmarks.append({"x": float(cur_px), "y": float(cur_py), "z": float(cur_pz)})
 

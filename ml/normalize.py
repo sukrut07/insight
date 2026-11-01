@@ -149,12 +149,16 @@ def process_dual_hand_landmarks(
     if left_present > 0.5:
         norm_left, _ = normalize_hand_landmarks(left_hand_xyz)
         angles_left = compute_finger_joint_angles(norm_left)
+        # Retain physical wrist position in the frame for spatial location & motion trajectory tracking
+        norm_left[0] = left_hand_xyz[0]
 
     norm_right = np.zeros((21, 3), dtype=np.float32)
     angles_right = np.zeros((10,), dtype=np.float32)
     if right_present > 0.5:
         norm_right, _ = normalize_hand_landmarks(right_hand_xyz)
         angles_right = compute_finger_joint_angles(norm_right)
+        # Retain physical wrist position in the frame for spatial location & motion trajectory tracking
+        norm_right[0] = right_hand_xyz[0]
 
     # Combine: 126 normalized coords + 20 angles + 2 presence flags = 148 features
     engineered_features = np.concatenate([
