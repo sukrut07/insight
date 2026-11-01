@@ -49,6 +49,15 @@ const CARDS: CardData[] = [
     tag: 'Local On-Device AI',
     artType: 'ily',
   },
+  {
+    id: 'workbook',
+    num: '05',
+    title: 'Interactive Workbook',
+    subtitle: 'Step-by-step fingerspelling & alphabet practice with live visual feedback.',
+    bg: '#EBD9FC', // Soft lavender
+    tag: 'Live Gesture Canvas',
+    artType: 'help',
+  },
 ];
 
 export const HeroCardStack: React.FC = () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchPlatformKpis } from '../services/api';
-import { Globe, BookCheck, Type, Cpu, RefreshCw } from 'lucide-react';
+import { Globe, BookCheck, Type, Cpu, RefreshCw, Sparkles } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 interface PlatformKpiData {
@@ -61,7 +61,7 @@ export const LandingKpiCards: React.FC = () => {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
         {/* KPI 1: Supported Languages */}
         <div className="neo-card bg-pastel-mint p-5 sm:p-6 border-2 border-charcoal rounded-2xl shadow-hard flex flex-col justify-between transition-transform hover:-translate-y-1">
           <div className="flex items-center justify-between">
@@ -169,6 +169,27 @@ export const LandingKpiCards: React.FC = () => {
           </div>
           <div className="text-[11px] text-charcoal-muted pt-2 border-t border-charcoal/20">
             Trained on dual-hand kinematic data
+          </div>
+        </div>
+
+        {/* KPI 5: Model Accuracy */}
+        <div className="neo-card bg-pastel-pink p-5 sm:p-6 border-2 border-charcoal rounded-2xl shadow-hard flex flex-col justify-between transition-transform hover:-translate-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-charcoal">
+              05 • Accuracy
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-white border border-charcoal flex items-center justify-center shadow-xs">
+              <Sparkles className="w-4 h-4 text-charcoal" />
+            </div>
+          </div>
+          <div className="my-3">
+            <div className="text-3xl sm:text-4xl font-black font-display text-charcoal">
+              94.2%
+            </div>
+            <p className="text-xs font-bold text-charcoal mt-1">Top-1 Accuracy</p>
+          </div>
+          <div className="text-[11px] text-charcoal-muted pt-2 border-t border-charcoal/20">
+            RF 94.2% • BiLSTM 93.3%
           </div>
         </div>
       </div>

@@ -700,7 +700,39 @@ export const InsightLandingPage: React.FC = () => {
           </motion.div>
         </div>
 
-        <div className="text-center pt-2">
+        {/* Interactive Workbook Spotlight Banner */}
+        <div className="neo-card bg-pastel-pink/40 border-2 border-charcoal p-6 sm:p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-hard-sm">
+          <div className="space-y-2 text-left max-w-xl">
+            <div className="flex items-center space-x-2">
+              <span className="neo-pill bg-pastel-pink text-charcoal shadow-hard-xs text-[11px]">
+                Interactive Workbook
+              </span>
+              <span className="text-xs font-mono font-bold text-charcoal">
+                Self-Paced Dual-Hand Drills
+              </span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black font-display text-charcoal">
+              Master sign language with tactile visual drills
+            </h3>
+            <p className="text-xs sm:text-sm text-charcoal-muted leading-relaxed">
+              Step through structured lessons for ISL, BSL, and ASL with live landmark overlay, instant accuracy feedback, and progressive gesture mastery.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('workbook');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="neo-btn bg-charcoal hover:bg-charcoal/90 text-white px-6 py-3.5 text-sm font-bold flex items-center space-x-2 shrink-0 shadow-hard-xs"
+          >
+            <Sparkles className="w-4 h-4 text-pastel-pink" />
+            <span>Launch Sign Workbook</span>
+            <ArrowRight className="w-4 h-4 text-pastel-mint" />
+          </button>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           <button
             type="button"
             onClick={() => {
@@ -937,6 +969,17 @@ export const InsightLandingPage: React.FC = () => {
                     Sign Dictionary
                   </button>
                 </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('workbook');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-charcoal font-medium"
+                  >
+                    Sign Workbook
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -1001,7 +1044,7 @@ export const InsightLandingPage: React.FC = () => {
                 </li>
                 <li>
                   <a
-                    href="https://github.com/sukrutdusane/insight"
+                    href="https://github.com/sukrut07/insight"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-charcoal font-medium inline-flex items-center space-x-1"

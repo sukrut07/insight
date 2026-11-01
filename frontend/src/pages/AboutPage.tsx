@@ -117,7 +117,7 @@ export const AboutPage: React.FC = () => {
         </div>
         <div className="flex items-center space-x-3">
           <a
-            href="https://github.com/sukrutdusane/insight"
+            href="https://github.com/sukrut07/insight"
             target="_blank"
             rel="noopener noreferrer"
             className="neo-btn bg-charcoal text-white hover:bg-charcoal/90 px-6 py-2.5 text-xs font-bold flex items-center space-x-2"
