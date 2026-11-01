@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     OLLAMA_PRIMARY_MODEL: str = "gemma4:e4b"
     OLLAMA_FALLBACK_MODEL: str = "gemma4:e2b"
     OLLAMA_ENABLED: bool = True
-    OLLAMA_TIMEOUT: float = 30.0
+    OLLAMA_TIMEOUT: float = 90.0
 
     # Backwards-compatible aliases for Ollama
     PRIMARY_LLM: str = "gemma4:e4b"

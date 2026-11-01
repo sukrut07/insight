@@ -64,8 +64,8 @@ class StaticGestureClassifier:
         if self.model_type == "rf":
             if SKLEARN_AVAILABLE and RandomForestClassifier is not None:
                 self.rf_model = RandomForestClassifier(
-                    n_estimators=100,
-                    max_depth=16,
+                    n_estimators=150,
+                    max_depth=20,
                     min_samples_split=2,
                     random_state=42,
                     class_weight="balanced"

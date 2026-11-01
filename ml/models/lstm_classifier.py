@@ -60,7 +60,7 @@ class TemporalGestureRNN(_BaseModule):
 
         self.classifier = nn.Sequential(
             nn.Linear(hidden_dim * 2, 64),
-            nn.BatchNorm1d(64),
+            nn.LayerNorm(64),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(64, num_classes)
@@ -111,12 +111,13 @@ class TemporalGestureClassifier:
         X: np.ndarray,
         y: np.ndarray,
         epochs: int = 35,
-        batch_size: int = 16,
-        learning_rate: float = 1e-3,
+        batch_size: int = 32,
+        learning_rate: float = 1.5e-3,
     ):
         """Fits the RNN on temporal sequence data X: shape (N, 30, 148), y: shape (N,)."""
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=learning_rate, weight_decay=1e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
         dataset = torch.utils.data.TensorDataset(
             torch.tensor(X, dtype=torch.float32),
@@ -133,6 +134,7 @@ class TemporalGestureClassifier:
                 loss = criterion(outputs, batch_y)
                 loss.backward()
                 optimizer.step()
+            scheduler.step()
 
     def predict(self, sequence_30x148: np.ndarray) -> Tuple[int, float]:
         """Inference on a single 30-frame sequence (30, 148)."""
